@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iron Shop Calculator - Working Version</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .header {
+            background: green;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .calculator {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: end;
+        }
+        .row > div {
+            flex: 1;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .total {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: green;
+            text-align: center;
+        }
+        .grand-total {
+            background: green;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-size: 24px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .remove-btn {
+            background: #dc3545;
+            padding: 10px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            transition: all 0.3s ease;
+        }
+        .remove-btn:hover {
+            background: #c82333;
+            transform: scale(1.1);
+        }
+        .total {
+            animation: pulse 0.5s ease-in-out;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .instruction-box {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-left: 5px solid #2196F3;
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔧 افضل آئرن شاپ کیلکولیٹر</h1>
+        <h2>Afzal Iron Shop Calculator</h2>
+        <p><strong>How to Use:</strong> Select Material → Enter Price → Enter Quantity → See Total</p>
+        <p><strong>استعمال:</strong> مواد منتخب کریں → قیمت داخل کریں → مقدار داخل کریں → کل دیکھیں</p>
+    </div>
+
+    <div class="calculator">
+        <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #2196F3;">
+            <h3>📋 Instructions / ہدایات:</h3>
+            <ol>
+                <li><strong>Select Material</strong> from dropdown / <strong>مواد منتخب کریں</strong></li>
+                <li><strong>Enter Price per Unit</strong> in Rs. / <strong>فی یونٹ قیمت داخل کریں</strong></li>
+                <li><strong>Enter Quantity</strong> / <strong>مقدار داخل کریں</strong></li>
+                <li><strong>Total calculates automatically</strong> / <strong>کل خودکار طور پر حساب ہو جائے گا</strong></li>
+                <li><strong>Click "Add New Item"</strong> for more materials / <strong>مزید مواد کے لیے نیا آئٹم شامل کریں</strong></li>
+            </ol>
+        </div>
+        
+        <button onclick="addItem()" style="background: #4CAF50; font-size: 18px; padding: 15px 30px;">➕ Add New Item / نیا آئٹم شامل کریں</button>
+        
+        <div id="items-container">
+            <!-- Items will be added here -->
+        </div>
+
+        <div class="grand-total" id="grandTotal" style="background: linear-gradient(135deg, #4CAF50, #45a049);">
+            کل رقم / Grand Total: Rs. 0.00
+        </div>
+
+        <div style="text-align: center;">
+            <button onclick="clearAll()" style="background: #f44336; font-size: 16px; padding: 12px 24px;">🗑️ Clear All / صاف کریں</button>
+            <button onclick="window.print()" style="background: #ff9800; font-size: 16px; padding: 12px 24px;">🖨️ Print Bill / بل پرنٹ کریں</button>
+            <button onclick="showExample()" style="background: #2196F3; font-size: 16px; padding: 12px 24px;">📋 Show Example / مثال دیکھیں</button>
+        </div>
+    </div>
+
+    <script>
+        let itemCount = 0;
+        
+        const materials = [
+            'سٹیل راڈ 8mm / Steel Rod 8mm - (Rs. 40-45 per piece)',
+            'سٹیل راڈ 10mm / Steel Rod 10mm - (Rs. 55-60 per piece)',
+            'سٹیل راڈ 12mm / Steel Rod 12mm - (Rs. 75-80 per piece)',
+            'سٹیل راڈ 16mm / Steel Rod 16mm - (Rs. 120-130 per piece)',
+            'سٹیل راڈ 20mm / Steel Rod 20mm - (Rs. 180-200 per piece)',
+            'آئرن شیٹ / Iron Sheet - (Rs. 80-90 per kg)',
+            'اینگل آئرن / Angle Iron - (Rs. 70-75 per kg)',
+            'پائپ / Pipe - (Rs. 85-95 per kg)',
+            'چینل / Channel - (Rs. 75-80 per kg)',
+            'بیم / Beam - (Rs. 70-75 per kg)'
+        ];
+
+        function addItem() {
+            itemCount++;
+            const container = document.getElementById('items-container');
+            
+            const itemDiv = document.createElement('div');
+            itemDiv.id = `item-${itemCount}`;
+            itemDiv.innerHTML = `
+                <hr style="margin: 20px 0; border: 2px solid #4CAF50;">
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h3 style="color: #2c3e50; margin: 0 0 15px 0;">📦 Item #${itemCount}</h3>
+                    <div class="row">
+                        <div>
+                            <label>مواد / Material:</label>
+                            <select id="material-${itemCount}" onchange="calculate()" style="font-size: 14px;">
+                                <option value="">منتخب کریں / Select Material</option>
+                                ${materials.map(m => `<option value="${m}">${m}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label>قیمت / Price per Unit (Rs.):</label>
+                            <input type="number" id="price-${itemCount}" placeholder="e.g. 50.00" step="0.01" onchange="calculate()">
+                        </div>
+                        <div>
+                            <label>مقدار / Quantity:</label>
+                            <input type="number" id="quantity-${itemCount}" placeholder="e.g. 10" step="0.01" onchange="calculate()">
+                        </div>
+                        <div>
+                            <label>کل / Total:</label>
+                            <div class="total" id="total-${itemCount}">Rs. 0.00</div>
+                        </div>
+                        <div>
+                            <button class="remove-btn" onclick="removeItem(${itemCount})" title="Remove this item">✕</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(itemDiv);
+        }
+
+        function removeItem(id) {
+            const item = document.getElementById(`item-${id}`);
+            if (item) {
+                item.remove();
+                calculate();
+            }
+        }
+
+        function calculate() {
+            let grandTotal = 0;
+            
+            for (let i = 1; i <= itemCount; i++) {
+                const priceInput = document.getElementById(`price-${i}`);
+                const quantityInput = document.getElementById(`quantity-${i}`);
+                const totalDiv = document.getElementById(`total-${i}`);
+                
+                if (priceInput && quantityInput && totalDiv) {
+                    const price = parseFloat(priceInput.value) || 0;
+                    const quantity = parseFloat(quantityInput.value) || 0;
+                    const total = price * quantity;
+                    
+                    totalDiv.textContent = `Rs. ${total.toFixed(2)}`;
+                    grandTotal += total;
+                }
+            }
+            
+            document.getElementById('grandTotal').textContent = `کل رقم / Grand Total: Rs. ${grandTotal.toFixed(2)}`;
+        }
+
+        function clearAll() {
+            document.getElementById('items-container').innerHTML = '';
+            itemCount = 0;
+            calculate();
+            addItem(); // Add one item automatically
+        }
+
+        function showExample() {
+            // Clear all first
+            clearAll();
+            
+            // Add example data
+            setTimeout(() => {
+                // First item
+                document.getElementById(`material-1`).value = materials[2]; // Steel Rod 12mm
+                document.getElementById(`price-1`).value = '75';
+                document.getElementById(`quantity-1`).value = '10';
+                
+                // Add second item
+                addItem();
+                setTimeout(() => {
+                    document.getElementById(`material-2`).value = materials[5]; // Iron Sheet
+                    document.getElementById(`price-2`).value = '85';
+                    document.getElementById(`quantity-2`).value = '5';
+                    
+                    // Add third item
+                    addItem();
+                    setTimeout(() => {
+                        document.getElementById(`material-3`).value = materials[6]; // Angle Iron
+                        document.getElementById(`price-3`).value = '70';
+                        document.getElementById(`quantity-3`).value = '3';
+                        calculate();
+                    }, 100);
+                }, 100);
+            }, 100);
+        }
+
+        // Add first item automatically
+        addItem();
+    </script>
+</body>
+</html>
