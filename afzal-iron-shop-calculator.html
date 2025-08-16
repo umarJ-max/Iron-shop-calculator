@@ -96,6 +96,49 @@
             box-sizing: border-box;
             overflow: hidden;
         }
+        
+        /* Search Suggestions Dropdown */
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: none;
+        }
+        
+        .search-suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+        
+        .search-suggestion-item:hover {
+            background: #f0f8ff;
+        }
+        
+        .search-suggestion-item:last-child {
+            border-bottom: none;
+        }
+        
+        .search-suggestion-category {
+            font-weight: bold;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        
+        .search-input-container {
+            position: relative;
+        }
         .total {
             background: #e8f5e8;
             padding: 10px;
@@ -653,11 +696,15 @@
                     <div class="row">
                         <div>
                             <label>مواد / Material:</label>
-                            <input type="text" id="material-search-${itemCount}" placeholder="Type to search materials..." 
-                                   onkeyup="searchMaterials(${itemCount}, this.value); resetSelection(${itemCount})" 
-                                   oninput="resetSelection(${itemCount})"
-                                   onfocus="showMaterialDropdown(${itemCount})"
-                                   style="margin-bottom: 5px;">
+                            <div class="search-input-container">
+                                <input type="text" id="material-search-${itemCount}" placeholder="Type to search materials..." 
+                                       onkeyup="showSearchSuggestions(${itemCount}, this.value)" 
+                                       oninput="resetSelection(${itemCount})"
+                                       onfocus="showSearchSuggestions(${itemCount}, this.value)"
+                                       onblur="hideSearchSuggestions(${itemCount})"
+                                       style="margin-bottom: 5px;">
+                                <div id="search-suggestions-${itemCount}" class="search-suggestions"></div>
+                            </div>
                             <select id="material-${itemCount}" onchange="selectMaterial(${itemCount}, this.value)" 
                                     style="font-size: 14px;">
                                 <option value="">منتخب کریں / Select Material</option>
@@ -784,17 +831,18 @@
             const date = now.toLocaleDateString('en-GB');
             const time = now.toLocaleTimeString('en-GB', { hour12: false });
             
-            // Generate bill content
+            // Generate readable bill content
             let billContent = `
-╔══════════════════════════════════════════════════════════╗
-║                  🔧 AFZAL IRON SHOP                      ║
-║                     افضل آئرن شاپ                        ║
-╠══════════════════════════════════════════════════════════╣
-║ Date: ${date}                    Time: ${time}    ║
-╠══════════════════════════════════════════════════════════╣
-║                        BILL / بل                         ║
-╚══════════════════════════════════════════════════════════╝
+************************************************************
+                    AFZAL IRON SHOP
+                     افضل آئرن شاپ
+************************************************************
+Date: ${date}                    Time: ${time}
+************************************************************
+                        BILL / بل
+************************************************************
 
+ITEMS PURCHASED:
 `;
 
             let itemFound = false;
@@ -819,10 +867,12 @@
                         // Clean material name (remove price hints)
                         const cleanMaterial = material.split(' - ')[0];
                         
-                        billContent += `${i}. ${cleanMaterial}\n`;
-                        billContent += `   Price: Rs. ${price.toFixed(2)} × Qty: ${quantity}\n`;
-                        billContent += `   Total: Rs. ${total.toFixed(2)}\n`;
-                        billContent += `${'─'.repeat(60)}\n`;
+                        billContent += `
+${i}. Material: ${cleanMaterial}
+   Unit Price: Rs. ${price.toFixed(2)}
+   Quantity: ${quantity}
+   Line Total: Rs. ${total.toFixed(2)}
+   ----------------------------------------------------`;
                     }
                 }
             }
@@ -833,15 +883,25 @@
             }
 
             // Add grand total
-            billContent += `\n${'═'.repeat(60)}\n`;
-            billContent += `                    GRAND TOTAL: Rs. ${grandTotal.toFixed(2)}\n`;
-            billContent += `                     کل رقم: Rs. ${grandTotal.toFixed(2)}\n`;
-            billContent += `${'═'.repeat(60)}\n\n`;
-            billContent += `Thank you for your business! / آپ کے کاروبار کا شکریہ!\n`;
-            billContent += `Generated by Afzal Iron Shop Calculator\n`;
-            billContent += `${now.toLocaleString()}\n`;
+            billContent += `
 
-            // Create and download file
+************************************************************
+                    GRAND TOTAL: Rs. ${grandTotal.toFixed(2)}
+                     کل رقم: Rs. ${grandTotal.toFixed(2)}
+************************************************************
+
+Thank you for your business!
+آپ کے کاروبار کے لیے شکریہ!
+
+Contact: Afzal Iron Shop
+Address: [Your Shop Address]
+Phone: [Your Phone Number]
+
+Generated by Afzal Iron Shop Calculator
+************************************************************
+`;
+
+            // Create and download file with proper encoding
             const blob = new Blob([billContent], { type: 'text/plain;charset=utf-8' });
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -1025,6 +1085,87 @@
             // Reset dropdown selection when user types in search box
             const select = document.getElementById(`material-${itemId}`);
             select.value = '';
+        }
+
+        // New Search Suggestions Functions
+        function showSearchSuggestions(itemId, searchTerm) {
+            const suggestionsContainer = document.getElementById(`search-suggestions-${itemId}`);
+            
+            if (searchTerm.length === 0) {
+                hideSearchSuggestions(itemId);
+                return;
+            }
+            
+            // Filter materials for suggestions
+            const suggestions = [];
+            const searchLower = searchTerm.toLowerCase();
+            
+            Object.keys(materialCategories).forEach(categoryName => {
+                const categoryMatches = [];
+                materialCategories[categoryName].forEach(material => {
+                    const materialLower = material.toLowerCase();
+                    if (materialLower.includes(searchLower) || 
+                        material.includes(searchTerm)) {
+                        categoryMatches.push(material);
+                    }
+                });
+                
+                if (categoryMatches.length > 0) {
+                    suggestions.push({
+                        category: categoryName,
+                        materials: categoryMatches.slice(0, 5) // Limit to 5 per category
+                    });
+                }
+            });
+            
+            // Build suggestions HTML
+            let suggestionsHTML = '';
+            suggestions.forEach(group => {
+                if (suggestionsHTML) suggestionsHTML += '<hr style="margin: 5px 0; border: 1px solid #f0f0f0;">';
+                suggestionsHTML += `<div class="search-suggestion-category">${group.category}</div>`;
+                group.materials.forEach(material => {
+                    const materialName = material.split(' - ')[0]; // Remove price info
+                    suggestionsHTML += `
+                        <div class="search-suggestion-item" 
+                             onmousedown="selectSuggestion(${itemId}, '${material}', '${materialName}')">
+                            ${material}
+                        </div>`;
+                });
+            });
+            
+            if (suggestions.length === 0) {
+                suggestionsHTML = `<div class="search-suggestion-item" style="color: #999;">No results for "${searchTerm}"</div>`;
+            }
+            
+            suggestionsContainer.innerHTML = suggestionsHTML;
+            suggestionsContainer.style.display = 'block';
+        }
+
+        function hideSearchSuggestions(itemId) {
+            setTimeout(() => {
+                const suggestionsContainer = document.getElementById(`search-suggestions-${itemId}`);
+                if (suggestionsContainer) {
+                    suggestionsContainer.style.display = 'none';
+                }
+            }, 200); // Delay to allow click to register
+        }
+
+        function selectSuggestion(itemId, fullMaterial, displayName) {
+            const searchInput = document.getElementById(`material-search-${itemId}`);
+            const select = document.getElementById(`material-${itemId}`);
+            
+            // Set the search input to show selected material
+            searchInput.value = displayName;
+            
+            // Set the dropdown to the selected material
+            select.value = fullMaterial;
+            
+            // Hide suggestions
+            const suggestionsContainer = document.getElementById(`search-suggestions-${itemId}`);
+            suggestionsContainer.style.display = 'none';
+            
+            // Trigger calculation
+            calculate();
         }
 
         // Add first item automatically
