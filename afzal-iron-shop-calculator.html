@@ -104,18 +104,49 @@
             left: 0;
             right: 0;
             background: white;
-            border: 1px solid #ddd;
+            border: 2px solid #4CAF50;
             border-top: none;
-            border-radius: 0 0 5px 5px;
-            max-height: 200px;
+            border-radius: 0 0 8px 8px;
+            max-height: 250px; /* Increased height for better visibility */
             overflow-y: auto;
             z-index: 9999; /* Increased z-index to make sure it appears on top of everything */
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             display: none;
+            scrollbar-width: thin;
+            scrollbar-color: #4CAF50 #f0f0f0;
+        }
+        
+        /* Custom scrollbar for webkit browsers */
+        .search-suggestions::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .search-suggestions::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 0 0 8px 0;
+        }
+        
+        .search-suggestions::-webkit-scrollbar-thumb {
+            background-color: #4CAF50;
+            border-radius: 10px;
+            border: 2px solid #f0f0f0;
         }
         
         .search-suggestions:not(:empty) {
             display: block !important;
+        }
+        
+        /* Pulse animation for Add Item buttons */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(103, 58, 183, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(103, 58, 183, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(103, 58, 183, 0);
+            }
         }
         
         .search-suggestion-item {
@@ -149,16 +180,25 @@
         }
         
         .search-suggestion-item {
-            padding: 10px;
+            padding: 12px 15px;
             cursor: pointer;
             border-bottom: 1px solid #f0f0f0;
-            font-size: 14px;
+            font-size: 15px;
             background-color: white;
+            transition: all 0.2s ease;
+            position: relative;
         }
         
         .search-suggestion-item:hover {
             background-color: #e8f5e8;
             color: #006633;
+            padding-left: 20px; /* Slight indent on hover for better visual feedback */
+            font-weight: bold;
+        }
+        
+        .search-suggestion-item:active {
+            background-color: #d4edda;
+            transform: scale(0.98);
         }
         .total {
             background: #e8f5e8;
@@ -595,7 +635,19 @@
             </ol>
         </div>
         
-        <button onclick="addItem()" class="btn-add">➕ Add New Item / نیا آئٹم شامل کریں</button>
+        <button onclick="addItem()" class="btn-add" style="
+            background: linear-gradient(135deg, #673AB7, #512DA8) !important;
+            color: white !important;
+            font-size: 18px !important;
+            padding: 15px 20px !important;
+            border-radius: 50px !important;
+            box-shadow: 0 4px 8px rgba(103, 58, 183, 0.3) !important;
+            margin: 15px auto !important;
+            display: block !important;
+            width: 100% !important;
+            animation: pulse 2s infinite !important;
+            transition: all 0.3s ease !important;
+        ">➕ Add New Item / نیا آئٹم شامل کریں</button>
         
         <div id="items-container">
             <!-- Items will be added here -->
@@ -620,6 +672,22 @@
         ">
             کل رقم / Grand Total: Rs. 0.00
         </div>
+        
+        <!-- Bottom Add Item Button for mobile usability -->
+        <button onclick="addItem()" class="btn-add" style="
+            margin: 20px auto !important;
+            display: block !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            background: linear-gradient(135deg, #673AB7, #512DA8) !important;
+            color: white !important;
+            font-size: 18px !important;
+            padding: 15px 20px !important;
+            border-radius: 50px !important;
+            box-shadow: 0 4px 8px rgba(103, 58, 183, 0.3) !important;
+            animation: pulse 2s infinite !important;
+            transition: all 0.3s ease !important;
+        ">➕ Add New Item / نیا آئٹم شامل کریں</button>
 
         <div style="text-align: center;">
             <button onclick="clearAll()" class="btn-clear">🗑️ Clear All / صاف کریں</button>
@@ -718,13 +786,15 @@
                         <div>
                             <label>مواد / Material:</label>
                             <div class="search-input-container" style="position: relative;">
-                                <input type="text" id="material-search-${itemCount}" placeholder="Type to search materials..." 
+                                <input type="text" id="material-search-${itemCount}" placeholder="🔍 Type to search materials..." 
                                        onkeyup="searchMaterials(${itemCount}, this.value); showSearchSuggestions(${itemCount}, this.value)" 
                                        oninput="resetSelection(${itemCount}); showSearchSuggestions(${itemCount}, this.value)"
                                        onfocus="showSearchSuggestions(${itemCount}, this.value)"
                                        onblur="hideSearchSuggestions(${itemCount})"
                                        autocomplete="off"
-                                       style="margin-bottom: 5px; width: 100%; position: relative;">
+                                       style="margin-bottom: 5px; width: 100%; position: relative; padding: 12px 15px; 
+                                              border: 2px solid #4CAF50; border-radius: 8px; font-size: 16px; 
+                                              box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
                                 <div id="search-suggestions-${itemCount}" class="search-suggestions"
                                      onmousedown="event.preventDefault()" 
                                      onclick="event.stopPropagation()" 
