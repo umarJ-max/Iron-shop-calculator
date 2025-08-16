@@ -108,6 +108,106 @@
             from { opacity: 0; transform: translateX(-20px); }
             to { opacity: 1; transform: translateX(0); }
         }
+        
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .header h2 {
+                font-size: 1.4rem;
+            }
+            
+            .header p {
+                font-size: 0.9rem;
+            }
+            
+            .calculator {
+                padding: 15px;
+            }
+            
+            .row {
+                display: block !important;
+                gap: 0 !important;
+            }
+            
+            .row > div {
+                margin-bottom: 15px !important;
+                width: 100% !important;
+            }
+            
+            .item-row {
+                padding: 15px !important;
+                border-radius: 10px !important;
+            }
+            
+            label {
+                font-size: 14px !important;
+                font-weight: bold !important;
+                color: #333 !important;
+                margin-bottom: 8px !important;
+            }
+            
+            input, select {
+                width: 100% !important;
+                padding: 15px !important;
+                font-size: 16px !important;
+                border: 2px solid #ddd !important;
+                border-radius: 8px !important;
+                box-sizing: border-box !important;
+            }
+            
+            .total {
+                padding: 15px !important;
+                font-size: 1.3rem !important;
+                margin-top: 10px !important;
+                text-align: center !important;
+                border-radius: 8px !important;
+            }
+            
+            .remove-btn {
+                width: 50px !important;
+                height: 50px !important;
+                font-size: 1.4rem !important;
+                margin: 10px auto !important;
+                display: block !important;
+            }
+            
+            .grand-total {
+                font-size: 1.5rem !important;
+                padding: 20px !important;
+                margin: 15px 0 !important;
+            }
+            
+            button {
+                width: 100% !important;
+                margin: 8px 0 !important;
+                padding: 15px !important;
+                font-size: 16px !important;
+            }
+            
+            .action-buttons {
+                flex-direction: column !important;
+            }
+            
+            .instruction-box {
+                padding: 10px !important;
+                margin-bottom: 15px !important;
+            }
+            
+            .instruction-box h3 {
+                font-size: 1.1rem !important;
+            }
+            
+            .instruction-box ol {
+                font-size: 0.9rem !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -142,6 +242,7 @@
 
         <div style="text-align: center;">
             <button onclick="clearAll()" style="background: #f44336; font-size: 16px; padding: 12px 24px;">🗑️ Clear All / صاف کریں</button>
+            <button onclick="downloadBill()" style="background: #4CAF50; font-size: 16px; padding: 12px 24px;">💾 Download Bill / بل ڈاؤن لوڈ کریں</button>
             <button onclick="window.print()" style="background: #ff9800; font-size: 16px; padding: 12px 24px;">🖨️ Print Bill / بل پرنٹ کریں</button>
             <button onclick="showExample()" style="background: #2196F3; font-size: 16px; padding: 12px 24px;">📋 Show Example / مثال دیکھیں</button>
         </div>
@@ -267,6 +368,113 @@
                     }, 100);
                 }, 100);
             }, 100);
+        }
+
+        function downloadBill() {
+            // Get current date and time
+            const now = new Date();
+            const date = now.toLocaleDateString('en-GB');
+            const time = now.toLocaleTimeString('en-GB', { hour12: false });
+            
+            // Generate bill content
+            let billContent = `
+╔══════════════════════════════════════════════════════════╗
+║                  🔧 AFZAL IRON SHOP                      ║
+║                     افضل آئرن شاپ                        ║
+╠══════════════════════════════════════════════════════════╣
+║ Date: ${date}                    Time: ${time}    ║
+╠══════════════════════════════════════════════════════════╣
+║                        BILL / بل                         ║
+╚══════════════════════════════════════════════════════════╝
+
+`;
+
+            let itemFound = false;
+            let grandTotal = 0;
+
+            // Add items to bill
+            for (let i = 1; i <= itemCount; i++) {
+                const materialSelect = document.getElementById(`material-${i}`);
+                const priceInput = document.getElementById(`price-${i}`);
+                const quantityInput = document.getElementById(`quantity-${i}`);
+                
+                if (materialSelect && priceInput && quantityInput) {
+                    const material = materialSelect.value;
+                    const price = parseFloat(priceInput.value) || 0;
+                    const quantity = parseFloat(quantityInput.value) || 0;
+                    const total = price * quantity;
+                    
+                    if (material && price > 0 && quantity > 0) {
+                        itemFound = true;
+                        grandTotal += total;
+                        
+                        // Clean material name (remove price hints)
+                        const cleanMaterial = material.split(' - ')[0];
+                        
+                        billContent += `${i}. ${cleanMaterial}\n`;
+                        billContent += `   Price: Rs. ${price.toFixed(2)} × Qty: ${quantity}\n`;
+                        billContent += `   Total: Rs. ${total.toFixed(2)}\n`;
+                        billContent += `${'─'.repeat(60)}\n`;
+                    }
+                }
+            }
+
+            if (!itemFound) {
+                alert('No items found! Please add some materials first.\nکوئی آئٹم نہیں ملا! پہلے کچھ مواد شامل کریں۔');
+                return;
+            }
+
+            // Add grand total
+            billContent += `\n${'═'.repeat(60)}\n`;
+            billContent += `                    GRAND TOTAL: Rs. ${grandTotal.toFixed(2)}\n`;
+            billContent += `                     کل رقم: Rs. ${grandTotal.toFixed(2)}\n`;
+            billContent += `${'═'.repeat(60)}\n\n`;
+            billContent += `Thank you for your business! / آپ کے کاروبار کا شکریہ!\n`;
+            billContent += `Generated by Afzal Iron Shop Calculator\n`;
+            billContent += `${now.toLocaleString()}\n`;
+
+            // Create and download file
+            const blob = new Blob([billContent], { type: 'text/plain;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Afzal-Iron-Shop-Bill-${date.replace(/\//g, '-')}-${time.replace(/:/g, '-')}.txt`;
+            
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            
+            // Show success message
+            alert('Bill downloaded successfully! / بل کامیابی سے ڈاؤن لوڈ ہو گیا!');
+            
+            // Save to localStorage as backup
+            saveBillToStorage(billContent, grandTotal);
+        }
+
+        function saveBillToStorage(billContent, total) {
+            try {
+                const bills = JSON.parse(localStorage.getItem('afzalIronShopBills') || '[]');
+                const newBill = {
+                    id: Date.now(),
+                    date: new Date().toISOString(),
+                    content: billContent,
+                    total: total,
+                    timestamp: new Date().toLocaleString()
+                };
+                
+                bills.unshift(newBill); // Add to beginning
+                
+                // Keep only last 50 bills
+                if (bills.length > 50) {
+                    bills.splice(50);
+                }
+                
+                localStorage.setItem('afzalIronShopBills', JSON.stringify(bills));
+            } catch (error) {
+                console.log('Could not save to localStorage:', error);
+            }
         }
 
         // Add first item automatically
