@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Force cache refresh -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <title>افضل آئرن شاپ کیلکولیٹر - Afzal Iron Shop Calculator</title>
     
     <!-- PWA Meta Tags -->
@@ -99,20 +105,23 @@
             text-align: center;
         }
         .grand-total {
-            background: linear-gradient(135deg, #4CAF50, #45a049);
-            color: white;
-            padding: 15px 30px;
-            text-align: center;
-            border-radius: 25px;
-            margin: 10px auto;
-            font-size: 18px;
-            font-weight: bold;
-            display: inline-block;
-            width: auto;
-            box-sizing: border-box;
-            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
-            border: none;
-            cursor: default;
+            background: linear-gradient(135deg, #4CAF50, #45a049) !important;
+            color: white !important;
+            padding: 15px 30px !important;
+            text-align: center !important;
+            border-radius: 25px !important;
+            margin: 10px auto !important;
+            font-size: 18px !important;
+            font-weight: bold !important;
+            display: inline-block !important;
+            width: auto !important;
+            max-width: none !important;
+            min-width: auto !important;
+            box-sizing: border-box !important;
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3) !important;
+            border: none !important;
+            cursor: default !important;
+            overflow: visible !important;
         }
         button {
             padding: 12px 25px;
@@ -458,6 +467,28 @@
                 border-radius: 18px !important;
                 width: auto !important;
             }
+        }
+        
+        /* Aggressive mobile fix for stubborn devices */
+        @media screen and (max-width: 767px) {
+            #grandTotal {
+                padding: 12px 20px !important;
+                font-size: 14px !important;
+                width: auto !important;
+                max-width: fit-content !important;
+                display: inline-block !important;
+                margin: 8px auto !important;
+                border-radius: 20px !important;
+            }
+        }
+        
+        /* Force cache refresh with version */
+        .grand-total[id="grandTotal"] {
+            padding: 15px 30px !important;
+            font-size: 18px !important;
+            width: auto !important;
+            display: inline-block !important;
+            max-width: fit-content !important;
         }
     </style>
 </head>
