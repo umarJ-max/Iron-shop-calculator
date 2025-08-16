@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Afzal Iron Shop Calculator - Landing Page</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#006633">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Iron Calculator">
+    <meta name="description" content="Professional calculator for iron shop materials - Calculate steel rods, iron sheets and more">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23006633'/%3E%3Ctext x='50' y='60' font-size='40' text-anchor='middle' fill='white'%3E🔧%3C/text%3E%3C/svg%3E">
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -105,5 +118,20 @@
             <p>Made for Pakistani Iron Shops | No Installation Required</p>
         </div>
     </div>
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>

@@ -1,0 +1,33 @@
+{
+  "name": "Afzal Iron Shop Calculator",
+  "short_name": "Iron Calculator",
+  "description": "Professional calculator for iron shop materials - افضل آئرن شاپ کیلکولیٹر",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#006633",
+  "theme_color": "#006633",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-US",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23006633'/%3E%3Ctext x='50' y='60' font-size='40' text-anchor='middle' fill='white'%3E🔧%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23006633'/%3E%3Ctext x='50' y='60' font-size='40' text-anchor='middle' fill='white'%3E🔧%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800'%3E%3Crect width='400' height='800' fill='%23f5f5f5'/%3E%3Crect x='20' y='50' width='360' height='100' rx='10' fill='%23006633'/%3E%3Ctext x='200' y='110' font-size='24' text-anchor='middle' fill='white'%3EAfzal Iron Shop Calculator%3C/text%3E%3Crect x='20' y='180' width='360' height='500' rx='10' fill='white'/%3E%3Ctext x='200' y='220' font-size='16' text-anchor='middle' fill='%23333'%3ECalculate iron materials easily%3C/text%3E%3C/svg%3E",
+      "sizes": "400x800",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    }
+  ]
+}

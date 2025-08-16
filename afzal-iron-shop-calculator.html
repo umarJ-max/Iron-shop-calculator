@@ -3,7 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iron Shop Calculator - Working Version</title>
+    <title>افضل آئرن شاپ کیلکولیٹر - Afzal Iron Shop Calculator</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#006633">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Iron Calculator">
+    <meta name="description" content="Professional calculator for iron shop materials - Calculate steel rods, iron sheets and more">
+    <meta name="keywords" content="iron shop, calculator, steel, Pakistan, افضل آئرن شاپ">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23006633'/%3E%3Ctext x='50' y='60' font-size='40' text-anchor='middle' fill='white'%3E🔧%3C/text%3E%3C/svg%3E">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Urdu:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -25,15 +42,19 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 100% !important;
+            overflow-x: auto !important;
         }
         .row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 40px;
+            gap: 15px;
             align-items: end;
+            margin-bottom: 15px;
         }
         .row > div {
-            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
         label {
             display: block;
@@ -63,21 +84,139 @@
             border-radius: 5px;
             margin: 20px 0;
             font-size: 24px;
+            display: grid !important;
+            place-items: center !important;
+            width: 100% !important;
         }
         button {
-            padding: 10px 20px;
-            background: #007bff;
-            color: white;
+            padding: 12px 25px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            margin: 5px;
-            font-size: 16px;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
         }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        button:hover::before {
+            left: 100%;
+        }
+        
         button:hover {
-            background: #0056b3;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+        
+        .btn-add {
+            background: linear-gradient(135deg, #4CAF50, #45a049) !important;
+            color: white !important;
+            padding: 15px 30px !important;
+            font-size: 18px !important;
+            border-radius: 25px !important;
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3) !important;
+        }
+        
+        .btn-add:hover {
+            background: linear-gradient(135deg, #45a049, #4CAF50) !important;
+            box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4) !important;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(135deg, #f44336, #d32f2f) !important;
+            color: white !important;
+            border-radius: 25px !important;
+            box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3) !important;
+        }
+        
+        .btn-clear:hover {
+            background: linear-gradient(135deg, #d32f2f, #f44336) !important;
+            box-shadow: 0 6px 16px rgba(244, 67, 54, 0.4) !important;
+        }
+        
+        .btn-download {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32) !important;
+            color: white !important;
+            border-radius: 25px !important;
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3) !important;
+        }
+        
+        .btn-download:hover {
+            background: linear-gradient(135deg, #2E7D32, #4CAF50) !important;
+            box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4) !important;
+        }
+        
+        .btn-print {
+            background: linear-gradient(135deg, #ff9800, #f57c00) !important;
+            color: white !important;
+            border-radius: 25px !important;
+            box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3) !important;
+        }
+        
+        .btn-print:hover {
+            background: linear-gradient(135deg, #f57c00, #ff9800) !important;
+            box-shadow: 0 6px 16px rgba(255, 152, 0, 0.4) !important;
+        }
+        
+        .btn-example {
+            background: linear-gradient(135deg, #2196F3, #1976D2) !important;
+            color: white !important;
+            border-radius: 25px !important;
+            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3) !important;
+        }
+        
+        .btn-example:hover {
+            background: linear-gradient(135deg, #1976D2, #2196F3) !important;
+            box-shadow: 0 6px 16px rgba(33, 150, 243, 0.4) !important;
+        }
+        
+        /* Action Buttons Layout Fix */
+        .action-buttons {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+            gap: 15px !important;
+            justify-content: center !important;
+            margin-top: 25px !important;
+            padding: 0 20px !important;
+        }
+        
+        .action-buttons button {
+            width: 100% !important;
+            padding: 14px 20px !important;
+            font-size: 16px !important;
+            margin: 0 !important;
+            white-space: nowrap !important;
+        }
+        
+        /* Input Field Alignment Fix */
+        .row select,
+        .row input[type="number"] {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            margin: 0 !important;
+        }
+        
+        /* Price Text Alignment */
+        .row span {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            min-height: 40px !important;
+            font-weight: bold !important;
         }
         .remove-btn {
             background: #dc3545;
@@ -184,6 +323,18 @@
                 margin: 15px 0 !important;
             }
             
+            /* Mobile Action Buttons */
+            .action-buttons {
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+                padding: 0 10px !important;
+            }
+            
+            .action-buttons button {
+                font-size: 14px !important;
+                padding: 12px 16px !important;
+            }
+            
             button {
                 width: 100% !important;
                 margin: 8px 0 !important;
@@ -214,8 +365,8 @@
     <div class="header">
         <h1>🔧 افضل آئرن شاپ کیلکولیٹر</h1>
         <h2>Afzal Iron Shop Calculator</h2>
-        <p><strong>How to Use:</strong> Select Material → Enter Price → Enter Quantity → See Total</p>
-        <p><strong>استعمال:</strong> مواد منتخب کریں → قیمت داخل کریں → مقدار داخل کریں → کل دیکھیں</p>
+        <p><strong>Professional Material Calculator for Iron Shops</strong></p>
+        <p><strong>آئرن شاپ کے لیے پیشہ ورانہ مواد کیلکولیٹر</strong></p>
     </div>
 
     <div class="calculator">
@@ -230,7 +381,7 @@
             </ol>
         </div>
         
-        <button onclick="addItem()" style="background: #4CAF50; font-size: 18px; padding: 15px 30px;">➕ Add New Item / نیا آئٹم شامل کریں</button>
+        <button onclick="addItem()" class="btn-add">➕ Add New Item / نیا آئٹم شامل کریں</button>
         
         <div id="items-container">
             <!-- Items will be added here -->
@@ -241,30 +392,89 @@
         </div>
 
         <div style="text-align: center;">
-            <button onclick="clearAll()" style="background: #f44336; font-size: 16px; padding: 12px 24px;">🗑️ Clear All / صاف کریں</button>
-            <button onclick="downloadBill()" style="background: #4CAF50; font-size: 16px; padding: 12px 24px;">💾 Download Bill / بل ڈاؤن لوڈ کریں</button>
-            <button onclick="window.print()" style="background: #ff9800; font-size: 16px; padding: 12px 24px;">🖨️ Print Bill / بل پرنٹ کریں</button>
-            <button onclick="showExample()" style="background: #2196F3; font-size: 16px; padding: 12px 24px;">📋 Show Example / مثال دیکھیں</button>
+            <button onclick="clearAll()" class="btn-clear">🗑️ Clear All / صاف کریں</button>
+            <button onclick="downloadBill()" class="btn-download">💾 Download Bill / بل ڈاؤن لوڈ کریں</button>
+            <button onclick="window.print()" class="btn-print">🖨️ Print Bill / بل پرنٹ کریں</button>
+            <button onclick="showExample()" class="btn-example">📋 Show Example / مثال دیکھیں</button>
         </div>
     </div>
 
     <script>
         let itemCount = 0;
         
-        const materials = [
-            'سٹیل راڈ 8mm / Steel Rod 8mm - (Rs. 40-45 per piece)',
-            'سٹیل راڈ 10mm / Steel Rod 10mm - (Rs. 55-60 per piece)',
-            'سٹیل راڈ 12mm / Steel Rod 12mm - (Rs. 75-80 per piece)',
-            'سٹیل راڈ 16mm / Steel Rod 16mm - (Rs. 120-130 per piece)',
-            'سٹیل راڈ 20mm / Steel Rod 20mm - (Rs. 180-200 per piece)',
-            'آئرن شیٹ / Iron Sheet - (Rs. 80-90 per kg)',
-            'اینگل آئرن / Angle Iron - (Rs. 70-75 per kg)',
-            'پائپ / Pipe - (Rs. 85-95 per kg)',
-            'چینل / Channel - (Rs. 75-80 per kg)',
-            'بیم / Beam - (Rs. 70-75 per kg)'
-        ];
+        const materialCategories = {
+            'Steel Rods / سٹیل راڈز': [
+                'سٹیل راڈ 6mm / Steel Rod 6mm - (Rs. 25-30 per piece)',
+                'سٹیل راڈ 8mm / Steel Rod 8mm - (Rs. 40-45 per piece)',
+                'سٹیل راڈ 10mm / Steel Rod 10mm - (Rs. 55-60 per piece)',
+                'سٹیل راڈ 12mm / Steel Rod 12mm - (Rs. 75-80 per piece)',
+                'سٹیل راڈ 16mm / Steel Rod 16mm - (Rs. 120-130 per piece)',
+                'سٹیل راڈ 20mm / Steel Rod 20mm - (Rs. 180-200 per piece)',
+                'سٹیل راڈ 25mm / Steel Rod 25mm - (Rs. 280-300 per piece)',
+                'سٹیل راڈ 32mm / Steel Rod 32mm - (Rs. 450-500 per piece)',
+                'سٹیل راڈ 40mm / Steel Rod 40mm - (Rs. 700-750 per piece)'
+            ],
+            'Iron Sheets / آئرن شیٹس': [
+                'آئرن شیٹ 18 گیج / Iron Sheet 18 Gauge - (Rs. 85-90 per kg)',
+                'آئرن شیٹ 20 گیج / Iron Sheet 20 Gauge - (Rs. 80-85 per kg)',
+                'آئرن شیٹ 22 گیج / Iron Sheet 22 Gauge - (Rs. 75-80 per kg)',
+                'آئرن شیٹ 24 گیج / Iron Sheet 24 Gauge - (Rs. 70-75 per kg)',
+                'گیلوانائزڈ شیٹ / Galvanized Sheet - (Rs. 95-100 per kg)',
+                'کولڈ رولڈ شیٹ / Cold Rolled Sheet - (Rs. 90-95 per kg)',
+                'ہاٹ رولڈ شیٹ / Hot Rolled Sheet - (Rs. 85-90 per kg)'
+            ],
+            'Angle Iron / اینگل آئرن': [
+                'اینگل آئرن 25x25x3mm / Angle Iron 25x25x3mm - (Rs. 65-70 per kg)',
+                'اینگل آئرن 30x30x3mm / Angle Iron 30x30x3mm - (Rs. 70-75 per kg)',
+                'اینگل آئرن 40x40x5mm / Angle Iron 40x40x5mm - (Rs. 75-80 per kg)',
+                'اینگل آئرن 50x50x6mm / Angle Iron 50x50x6mm - (Rs. 80-85 per kg)',
+                'اینگل آئرن 65x65x6mm / Angle Iron 65x65x6mm - (Rs. 85-90 per kg)',
+                'اینگل آئرن 75x75x8mm / Angle Iron 75x75x8mm - (Rs. 90-95 per kg)'
+            ],
+            'Pipes / پائپس': [
+                'جی آئی پائپ 1/2 انچ / GI Pipe 1/2 inch - (Rs. 120-130 per foot)',
+                'جی آئی پائپ 3/4 انچ / GI Pipe 3/4 inch - (Rs. 150-160 per foot)',
+                'جی آئی پائپ 1 انچ / GI Pipe 1 inch - (Rs. 180-190 per foot)',
+                'جی آئی پائپ 1.5 انچ / GI Pipe 1.5 inch - (Rs. 280-300 per foot)',
+                'جی آئی پائپ 2 انچ / GI Pipe 2 inch - (Rs. 350-380 per foot)',
+                'ایم ایس پائپ / MS Pipe - (Rs. 95-105 per kg)',
+                'سکوائر پائپ / Square Pipe - (Rs. 100-110 per kg)'
+            ],
+            'Channels / چینلز': [
+                'چینل 75x40x5mm / Channel 75x40x5mm - (Rs. 75-80 per kg)',
+                'چینل 100x50x6mm / Channel 100x50x6mm - (Rs. 80-85 per kg)',
+                'چینل 125x65x6mm / Channel 125x65x6mm - (Rs. 85-90 per kg)',
+                'چینل 150x75x8mm / Channel 150x75x8mm - (Rs. 90-95 per kg)',
+                'چینل 200x100x8mm / Channel 200x100x8mm - (Rs. 95-100 per kg)'
+            ],
+            'Beams / بیمز': [
+                'آئی بیم 100mm / I-Beam 100mm - (Rs. 85-90 per kg)',
+                'آئی بیم 150mm / I-Beam 150mm - (Rs. 90-95 per kg)',
+                'آئی بیم 200mm / I-Beam 200mm - (Rs. 95-100 per kg)',
+                'آئی بیم 250mm / I-Beam 250mm - (Rs. 100-105 per kg)',
+                'ایچ بیم / H-Beam - (Rs. 105-110 per kg)'
+            ],
+            'Flat Bars / فلیٹ بارز': [
+                'فلیٹ بار 25x3mm / Flat Bar 25x3mm - (Rs. 70-75 per kg)',
+                'فلیٹ بار 40x5mm / Flat Bar 40x5mm - (Rs. 75-80 per kg)',
+                'فلیٹ بار 50x6mm / Flat Bar 50x6mm - (Rs. 80-85 per kg)',
+                'فلیٹ بار 75x8mm / Flat Bar 75x8mm - (Rs. 85-90 per kg)',
+                'فلیٹ بار 100x10mm / Flat Bar 100x10mm - (Rs. 90-95 per kg)'
+            ],
+            'Wire & Mesh / تار اور جالی': [
+                'بائنڈنگ وائر / Binding Wire - (Rs. 110-120 per kg)',
+                'چکن میش / Chicken Mesh - (Rs. 95-105 per kg)',
+                'چین لنک / Chain Link - (Rs. 85-95 per kg)',
+                'بارب وائر / Barbed Wire - (Rs. 100-110 per kg)',
+                'ویلڈنگ وائر / Welding Wire - (Rs. 150-170 per kg)'
+            ]
+        };
 
-        function addItem() {
+        // Flatten all materials for easy searching
+        const allMaterials = [];
+        Object.values(materialCategories).forEach(category => {
+            allMaterials.push(...category);
+        });        function addItem() {
             itemCount++;
             const container = document.getElementById('items-container');
             
@@ -277,9 +487,36 @@
                     <div class="row">
                         <div>
                             <label>مواد / Material:</label>
-                            <select id="material-${itemCount}" onchange="calculate()" style="font-size: 14px;">
+                            <input type="text" id="material-search-${itemCount}" placeholder="Type to search materials..." 
+                                   onkeyup="searchMaterials(${itemCount}, this.value)" 
+                                   onfocus="showMaterialDropdown(${itemCount})"
+                                   style="margin-bottom: 5px;">
+                            <select id="material-${itemCount}" onchange="selectMaterial(${itemCount}, this.value)" style="font-size: 14px;">
                                 <option value="">منتخب کریں / Select Material</option>
-                                ${materials.map(m => `<option value="${m}">${m}</option>`).join('')}
+                                <optgroup label="🔩 Steel Rods / سٹیل راڈز">
+                                    ${materialCategories['Steel Rods / سٹیل راڈز'].map(m => `<option value="${m}">${m}</option>`).join('')}
+                                </optgroup>
+                                <optgroup label="📋 Iron Sheets / آئرن شیٹس">
+                                    ${materialCategories['Iron Sheets / آئرن شیٹس'].map(m => `<option value="${m}">${m}</option>`).join('')}
+                                </optgroup>
+                                <optgroup label="📐 Angle Iron / اینگل آئرن">
+                                    ${materialCategories['Angle Iron / اینگل آئرن'].map(m => `<option value="${m}">${m}</option>`).join('')}
+                                </optgroup>
+                                <optgroup label="🔧 Pipes / پائپس">
+                                    ${materialCategories['Pipes / پائپس'].map(m => `<option value="${m}">${m}</option>`).join('')}
+                                </optgroup>
+                                <optgroup label="📏 Channels / چینلز">
+                                    ${materialCategories['Channels / چینلز'].map(m => `<option value="${m}">${m}</option>`).join('')}
+                                </optgroup>
+                                <optgroup label="🏗️ Beams / بیمز">
+                                    ${materialCategories['Beams / بیمز'].map(m => `<option value="${m}">${m}</option>`).join('')}
+                                </optgroup>
+                                <optgroup label="📏 Flat Bars / فلیٹ بارز">
+                                    ${materialCategories['Flat Bars / فلیٹ بارز'].map(m => `<option value="${m}">${m}</option>`).join('')}
+                                </optgroup>
+                                <optgroup label="🔗 Wire & Mesh / تار اور جالی">
+                                    ${materialCategories['Wire & Mesh / تار اور جالی'].map(m => `<option value="${m}">${m}</option>`).join('')}
+                                </optgroup>
                             </select>
                         </div>
                         <div>
@@ -346,23 +583,26 @@
             
             // Add example data
             setTimeout(() => {
-                // First item
-                document.getElementById(`material-1`).value = materials[2]; // Steel Rod 12mm
+                // First item - Steel Rod
+                document.getElementById(`material-1`).value = materialCategories['Steel Rods / سٹیل راڈز'][2]; // Steel Rod 12mm
+                document.getElementById(`material-search-1`).value = 'Steel Rod 12mm';
                 document.getElementById(`price-1`).value = '75';
                 document.getElementById(`quantity-1`).value = '10';
                 
                 // Add second item
                 addItem();
                 setTimeout(() => {
-                    document.getElementById(`material-2`).value = materials[5]; // Iron Sheet
-                    document.getElementById(`price-2`).value = '85';
+                    document.getElementById(`material-2`).value = materialCategories['Iron Sheets / آئرن شیٹس'][2]; // Iron Sheet 22 Gauge
+                    document.getElementById(`material-search-2`).value = 'Iron Sheet 22 Gauge';
+                    document.getElementById(`price-2`).value = '78';
                     document.getElementById(`quantity-2`).value = '5';
                     
                     // Add third item
                     addItem();
                     setTimeout(() => {
-                        document.getElementById(`material-3`).value = materials[6]; // Angle Iron
-                        document.getElementById(`price-3`).value = '70';
+                        document.getElementById(`material-3`).value = materialCategories['Angle Iron / اینگل آئرن'][2]; // Angle Iron 40x40x5mm
+                        document.getElementById(`material-search-3`).value = 'Angle Iron 40x40x5mm';
+                        document.getElementById(`price-3`).value = '77';
                         document.getElementById(`quantity-3`).value = '3';
                         calculate();
                     }, 100);
@@ -477,8 +717,185 @@
             }
         }
 
+        function searchMaterials(itemId, searchTerm) {
+            const select = document.getElementById(`material-${itemId}`);
+            const searchInput = document.getElementById(`material-search-${itemId}`);
+            
+            if (searchTerm.length === 0) {
+                // Show all categories when search is empty
+                populateAllCategories(select);
+                return;
+            }
+            
+            // Clear existing options
+            select.innerHTML = '<option value="">منتخب کریں / Select Material</option>';
+            
+            // Filter materials based on search term
+            const filteredMaterials = allMaterials.filter(material => 
+                material.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                material.includes(searchTerm)
+            );
+            
+            // Add filtered materials
+            filteredMaterials.forEach(material => {
+                const option = document.createElement('option');
+                option.value = material;
+                option.textContent = material;
+                select.appendChild(option);
+            });
+            
+            // Show message if no results
+            if (filteredMaterials.length === 0) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'No materials found / کوئی مواد نہیں ملا';
+                option.disabled = true;
+                select.appendChild(option);
+            }
+        }
+
+        function showMaterialDropdown(itemId) {
+            const select = document.getElementById(`material-${itemId}`);
+            const searchInput = document.getElementById(`material-search-${itemId}`);
+            
+            if (searchInput.value === '') {
+                populateAllCategories(select);
+            }
+        }
+
+        function populateAllCategories(select) {
+            select.innerHTML = '<option value="">منتخب کریں / Select Material</option>';
+            
+            Object.keys(materialCategories).forEach(categoryName => {
+                const optgroup = document.createElement('optgroup');
+                const icons = {
+                    'Steel Rods / سٹیل راڈز': '🔩',
+                    'Iron Sheets / آئرن شیٹس': '📋',
+                    'Angle Iron / اینگل آئرن': '📐',
+                    'Pipes / پائپس': '🔧',
+                    'Channels / چینلز': '📏',
+                    'Beams / بیمز': '🏗️',
+                    'Flat Bars / فلیٹ بارز': '📏',
+                    'Wire & Mesh / تار اور جالی': '🔗'
+                };
+                optgroup.label = `${icons[categoryName] || '📦'} ${categoryName}`;
+                
+                materialCategories[categoryName].forEach(material => {
+                    const option = document.createElement('option');
+                    option.value = material;
+                    option.textContent = material;
+                    optgroup.appendChild(option);
+                });
+                
+                select.appendChild(optgroup);
+            });
+        }
+
+        function selectMaterial(itemId, value) {
+            const searchInput = document.getElementById(`material-search-${itemId}`);
+            if (value) {
+                // Extract material name without price info for search field
+                const materialName = value.split(' - ')[0];
+                searchInput.value = materialName;
+            }
+            calculate();
+        }
+
         // Add first item automatically
         addItem();
+    </script>
+    
+    <!-- PWA Installation Script -->
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+
+        // PWA Install Button Functionality
+        let deferredPrompt;
+        const installButton = document.createElement('button');
+        installButton.textContent = '📱 Install App / ایپ انسٹال کریں';
+        installButton.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 1000;
+            font-size: 14px;
+            display: none;
+            animation: pulse 2s infinite;
+        `;
+
+        // Add CSS for pulse animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+                100% { transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+            // Show install button
+            installButton.style.display = 'block';
+            document.body.appendChild(installButton);
+        });
+
+        installButton.addEventListener('click', (e) => {
+            // Hide the button
+            installButton.style.display = 'none';
+            // Show the prompt
+            deferredPrompt.prompt();
+            // Wait for the user to respond to the prompt
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the A2HS prompt');
+                    alert('App installing... Check your home screen! / ایپ انسٹال ہو رہا ہے... اپنی ہوم سکرین چیک کریں!');
+                } else {
+                    console.log('User dismissed the A2HS prompt');
+                }
+                deferredPrompt = null;
+            });
+        });
+
+        // Show install instructions for iOS
+        function isIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        }
+
+        if (isIOS()) {
+            const iosInstallButton = document.createElement('div');
+            iosInstallButton.innerHTML = `
+                <div style="position: fixed; bottom: 20px; left: 20px; background: rgba(0,0,0,0.8); color: white; padding: 15px; border-radius: 10px; font-size: 12px; max-width: 250px; z-index: 1000;">
+                    📱 <strong>Install App:</strong><br>
+                    Tap <strong>Share</strong> button → <strong>Add to Home Screen</strong><br>
+                    <button onclick="this.parentElement.style.display='none'" style="background: #4CAF50; color: white; border: none; padding: 5px 10px; border-radius: 5px; margin-top: 10px;">Got it!</button>
+                </div>
+            `;
+            document.body.appendChild(iosInstallButton);
+        }
     </script>
 </body>
 </html>
