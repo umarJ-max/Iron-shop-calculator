@@ -114,6 +114,10 @@
             display: none;
         }
         
+        .search-suggestions:not(:empty) {
+            display: block;
+        }
+        
         .search-suggestion-item {
             padding: 10px;
             cursor: pointer;
@@ -698,7 +702,7 @@
                             <label>مواد / Material:</label>
                             <div class="search-input-container">
                                 <input type="text" id="material-search-${itemCount}" placeholder="Type to search materials..." 
-                                       onkeyup="showSearchSuggestions(${itemCount}, this.value)" 
+                                       onkeyup="searchMaterials(${itemCount}, this.value); showSearchSuggestions(${itemCount}, this.value)" 
                                        oninput="resetSelection(${itemCount})"
                                        onfocus="showSearchSuggestions(${itemCount}, this.value)"
                                        onblur="hideSearchSuggestions(${itemCount})"
