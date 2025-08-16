@@ -28,9 +28,6 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Urdu:wght@400;600;700&display=swap" rel="stylesheet">
     
-    <!-- PDF Generation Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -52,6 +49,7 @@
             width: 100vw;
             min-height: 100vh;
         }
+        
         .header {
             background: green;
             color: white;
@@ -60,603 +58,294 @@
             border-radius: 10px;
             margin-bottom: 20px;
         }
+        
+        /* Bill Modal Styles */
+        .modal {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .modal-content {
+            animation: slideDown 0.3s;
+        }
+        
+        .bill-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        
+        .bill-table th {
+            background-color: #e8f5e9;
+            color: #2E7D32;
+            padding: 10px;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 2px solid #2E7D32;
+        }
+        
+        .bill-table td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .bill-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .bill-table tr:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .bill-header {
+            border-bottom: 2px solid #2E7D32;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .bill-total {
+            background-color: #e8f5e9;
+            font-weight: bold;
+            font-size: 16px;
+            color: #2E7D32;
+        }
+        
+        .bill-footer {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
         .calculator {
             background: white;
             padding: 15px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            max-width: 100%;
-            width: 100%;
-            overflow-x: hidden;
-            box-sizing: border-box;
         }
+        
+        .calculator h2 {
+            text-align: center;
+            color: #4CAF50;
+        }
+        
         .row {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr 40px;
-            gap: 10px;
-            align-items: end;
-            margin-bottom: 15px;
-            width: 100%;
-            max-width: 100%;
-            overflow: hidden;
-            box-sizing: border-box;
-        }
-        .row > div {
             display: flex;
-            flex-direction: column;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            gap: 10px;
         }
+        
+        .row > div {
+            flex: 1;
+            min-width: 200px;
+        }
+        
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
+            color: #333;
         }
+        
         input, select {
             width: 100%;
-            max-width: 100%;
-            padding: 8px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-            box-sizing: border-box;
-            overflow: hidden;
-        }
-        
-        /* Search Suggestions Dropdown */
-        .search-suggestions {
-            position: absolute;
-            top: 100%;
-            left: -10%;
-            right: -10%;
-            width: 120%; /* Make wider than the input field */
-            background: white;
+            padding: 12px;
             border: 2px solid #4CAF50;
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-            max-height: 300px; /* Further increased height for better visibility */
-            overflow-y: auto;
-            z-index: 9999; /* Increased z-index to make sure it appears on top of everything */
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            display: none;
-            scrollbar-width: thin;
-            scrollbar-color: #4CAF50 #f0f0f0;
-        }
-        
-        /* Custom scrollbar for webkit browsers */
-        .search-suggestions::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        .search-suggestions::-webkit-scrollbar-track {
-            background: #f0f0f0;
-            border-radius: 0 0 8px 0;
-        }
-        
-        .search-suggestions::-webkit-scrollbar-thumb {
-            background-color: #4CAF50;
-            border-radius: 10px;
-            border: 2px solid #f0f0f0;
-        }
-        
-        .search-suggestions:not(:empty) {
-            display: block !important;
-        }
-        
-        /* Pulse animation for Add Item buttons */
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(103, 58, 183, 0.4);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(103, 58, 183, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(103, 58, 183, 0);
-            }
-        }
-        
-        .search-suggestion-item {
-            padding: 10px;
-            cursor: pointer;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 14px;
-        }
-        
-        .search-suggestion-item:hover {
-            background: #f0f8ff;
-        }
-        
-        .search-suggestion-item:last-child {
-            border-bottom: none;
-        }
-        
-        .search-suggestion-category {
-            font-weight: bold;
-            color: #666;
-            font-size: 12px;
-            text-transform: uppercase;
-            padding: 5px 10px;
-            background-color: #f5f5f5;
-        }
-        
-        .search-input-container {
-            position: relative;
-            z-index: 9000; /* High z-index for the container */
-            width: 100%;
-            overflow: visible; /* Ensure wider suggestions are not clipped */
-        }
-        
-        .search-suggestion-item {
-            padding: 15px 20px;
-            cursor: pointer;
-            border-bottom: 1px solid #f0f0f0;
+            border-radius: 8px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
             font-size: 16px;
-            background-color: white;
-            transition: all 0.2s ease;
-            position: relative;
-            line-height: 1.4;
-            white-space: normal;
-            word-break: break-word;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
-        .search-suggestion-item:hover {
-            background-color: #e8f5e8;
-            color: #006633;
-            padding-left: 25px; /* Slight indent on hover for better visual feedback */
-            font-weight: bold;
+        select {
+            cursor: pointer;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%234CAF50" viewBox="0 0 16 16"><path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/></svg>') no-repeat;
+            background-position: calc(100% - 12px) center;
+            -moz-appearance: none;
+            -webkit-appearance: none;
+            appearance: none;
+            padding-right: 30px;
         }
         
-        .search-suggestion-item:active {
-            background-color: #d4edda;
-            transform: scale(0.98);
-        }
-        .total {
-            background: #e8f5e8;
-            padding: 10px;
-            border-radius: 5px;
-            font-weight: bold;
-            color: green;
-            text-align: center;
-        }
-        /* CRITICAL: Grand Total Button Style - EXACT same as Add Item button */
-        .grand-total, .total-button-v2 {
-            background: linear-gradient(135deg, #4CAF50, #45a049) !important;
-            color: white !important;
-            padding: 15px 30px !important;
-            text-align: center !important;
-            border-radius: 25px !important;
-            margin: 10px auto !important;
-            font-size: 18px !important;
-            font-weight: bold !important;
-            display: inline-block !important;
-            width: auto !important;
-            max-width: fit-content !important;
-            min-width: auto !important;
-            box-sizing: border-box !important;
-            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3) !important;
-            border: none !important;
-            overflow: visible !important;
-        }
         button {
-            padding: 12px 25px;
+            padding: 12px 20px;
             border: none;
             border-radius: 8px;
-            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
             font-weight: bold;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.5s;
-        }
-        
-        button:hover::before {
-            left: 100%;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+            margin: 5px;
+            font-size: 16px;
         }
         
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 8px rgba(0,0,0,0.2);
+        }
+        
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 3px rgba(0,0,0,0.2);
         }
         
         .btn-add {
-            background: linear-gradient(135deg, #4CAF50, #45a049) !important;
-            color: white !important;
-            padding: 15px 30px !important;
-            font-size: 18px !important;
-            border-radius: 25px !important;
-            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3) !important;
-        }
-        
-        .btn-add:hover {
-            background: linear-gradient(135deg, #45a049, #4CAF50) !important;
-            box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4) !important;
+            background-color: #4CAF50;
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            display: block;
         }
         
         .btn-clear {
-            background: linear-gradient(135deg, #f44336, #d32f2f) !important;
-            color: white !important;
-            border-radius: 25px !important;
-            box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3) !important;
-        }
-        
-        .btn-clear:hover {
-            background: linear-gradient(135deg, #d32f2f, #f44336) !important;
-            box-shadow: 0 6px 16px rgba(244, 67, 54, 0.4) !important;
-        }
-        
-        .btn-download {
-            background: linear-gradient(135deg, #4CAF50, #2E7D32) !important;
-            color: white !important;
-            border-radius: 25px !important;
-            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3) !important;
-        }
-        
-        .btn-download:hover {
-            background: linear-gradient(135deg, #2E7D32, #4CAF50) !important;
-            box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4) !important;
+            background-color: #f44336;
         }
         
         .btn-print {
-            background: linear-gradient(135deg, #ff9800, #f57c00) !important;
-            color: white !important;
-            border-radius: 25px !important;
-            box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3) !important;
-        }
-        
-        .btn-print:hover {
-            background: linear-gradient(135deg, #f57c00, #ff9800) !important;
-            box-shadow: 0 6px 16px rgba(255, 152, 0, 0.4) !important;
+            background-color: #2196F3;
         }
         
         .btn-example {
-            background: linear-gradient(135deg, #2196F3, #1976D2) !important;
-            color: white !important;
-            border-radius: 25px !important;
-            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3) !important;
+            background-color: #FF9800;
         }
         
-        .btn-example:hover {
-            background: linear-gradient(135deg, #1976D2, #2196F3) !important;
-            box-shadow: 0 6px 16px rgba(33, 150, 243, 0.4) !important;
-        }
-        
-        /* Action Buttons Layout Fix */
-        .action-buttons {
-            display: grid !important;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
-            gap: 8px !important;
-            justify-content: center !important;
-            margin-top: 15px !important;
-            padding: 0 5px !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            box-sizing: border-box !important;
-            overflow: hidden !important;
-        }
-        
-        .action-buttons button {
-            width: 100% !important;
-            padding: 12px 15px !important;
-            font-size: 15px !important;
-            margin: 0 !important;
-            white-space: nowrap !important;
-            max-width: 100% !important;
-            box-sizing: border-box !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-        }
-        
-        /* Input Field Alignment Fix */
-        .row select,
-        .row input[type="number"] {
-            width: 100% !important;
-            max-width: 100% !important;
-            box-sizing: border-box !important;
-            margin: 0 !important;
-        }
-        
-        /* Price Text Alignment */
-        .row span {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            min-height: 40px !important;
-            font-weight: bold !important;
-        }
-        .remove-btn {
-            background: #dc3545;
-            padding: 10px;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            transition: all 0.3s ease;
-        }
-        .remove-btn:hover {
-            background: #c82333;
-            transform: scale(1.1);
-        }
-        .total {
-            animation: pulse 0.5s ease-in-out;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        .instruction-box {
-            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-            border-left: 5px solid #2196F3;
-            animation: slideIn 0.5s ease-out;
-        }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        
-        /* Mobile Responsive Styles */
-        @media (max-width: 768px) {
-            body {
-                padding: 5px !important;
-                margin: 0 !important;
-                width: 100vw !important;
-                overflow-x: hidden !important;
-            }
-            
-            .header h1 {
-                font-size: 1.8rem;
-            }
-            
-            .header h2 {
-                font-size: 1.4rem;
-            }
-            
-            .header p {
-                font-size: 0.9rem;
-            }
-            
-            .calculator {
-                padding: 10px !important;
-                margin: 0 !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                box-sizing: border-box !important;
-                overflow-x: hidden !important;
-            }
-            
-            .row {
-                display: block !important;
-                gap: 0 !important;
-            }
-            
-            .row > div {
-                margin-bottom: 15px !important;
-                width: 100% !important;
-            }
-            
-            .item-row {
-                padding: 15px !important;
-                border-radius: 10px !important;
-            }
-            
-            label {
-                font-size: 14px !important;
-                font-weight: bold !important;
-                color: #333 !important;
-                margin-bottom: 8px !important;
-            }
-            
-            input, select {
-                width: 100% !important;
-                padding: 15px !important;
-                font-size: 16px !important;
-                border: 2px solid #ddd !important;
-                border-radius: 8px !important;
-                box-sizing: border-box !important;
-            }
-            
-            .total {
-                padding: 15px !important;
-                font-size: 1.3rem !important;
-                margin-top: 10px !important;
-                text-align: center !important;
-                border-radius: 8px !important;
-            }
-            
-            .remove-btn {
-                width: 50px !important;
-                height: 50px !important;
-                font-size: 1.4rem !important;
-                margin: 10px auto !important;
-                display: block !important;
-            }
-            
-            .grand-total {
-                font-size: 16px !important;
-                padding: 12px 25px !important;
-                margin: 8px auto !important;
-                border-radius: 20px !important;
-            }
-            
-            /* Mobile Action Buttons */
-            .action-buttons {
-                grid-template-columns: 1fr !important;
-                gap: 8px !important;
-                padding: 0 5px !important;
-                margin-top: 15px !important;
-                width: 100% !important;
-                overflow: hidden !important;
-            }
-            
-            .action-buttons button {
-                font-size: 14px !important;
-                padding: 12px 10px !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                box-sizing: border-box !important;
-                overflow: hidden !important;
-                white-space: nowrap !important;
-                text-overflow: ellipsis !important;
-            }
-            
-            button {
-                width: 100% !important;
-                margin: 8px 0 !important;
-                padding: 15px !important;
-                font-size: 16px !important;
-            }
-            
-            /* Force single column for mobile action buttons */
-            .action-buttons {
-                display: grid !important;
-                grid-template-columns: 1fr !important;
-                gap: 8px !important;
-                padding: 0 !important;
-                margin: 10px 0 !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                overflow: hidden !important;
-            }
-            
-            .instruction-box {
-                padding: 10px !important;
-                margin-bottom: 15px !important;
-            }
-            
-            .instruction-box h3 {
-                font-size: 1.1rem !important;
-            }
-            
-            .instruction-box ol {
-                font-size: 0.9rem !important;
-            }
-        }
-        
-        /* Extra small screens - Force strict no overflow */
-        @media (max-width: 480px) {
-            * {
-                max-width: 100vw !important;
-                overflow-x: hidden !important;
-                box-sizing: border-box !important;
-            }
-            
-            body {
-                padding: 2px !important;
-                width: 100vw !important;
-            }
-            
-            .calculator {
-                padding: 5px !important;
-                width: calc(100vw - 4px) !important;
-            }
-            
-            .action-buttons {
-                grid-template-columns: 1fr !important;
-                padding: 0 !important;
-                margin: 5px 0 !important;
-                width: 100% !important;
-            }
-            
-            .action-buttons button {
-                padding: 10px 5px !important;
-                font-size: 13px !important;
-                width: 100% !important;
-            }
-            
-            .grand-total {
-                padding: 12px 20px !important;
-                font-size: 14px !important;
-                margin: 5px auto !important;
-                border-radius: 18px !important;
-                width: auto !important;
-            }
-        }
-        
-        /* Aggressive mobile fix for stubborn devices */
-        @media screen and (max-width: 767px) {
-            #grandTotal {
-                padding: 12px 20px !important;
-                font-size: 14px !important;
-                width: auto !important;
-                max-width: fit-content !important;
-                display: inline-block !important;
-                margin: 8px auto !important;
-                border-radius: 20px !important;
-            }
-        }
-        
-        /* Force cache refresh with version */
-        .grand-total[id="grandTotal"] {
-            padding: 15px 30px !important;
-            font-size: 18px !important;
-            width: auto !important;
-            display: inline-block !important;
-            max-width: fit-content !important;
-        }
-        
-        /* NEW CLASS - Bypass all cache issues */
         .total-button-v2 {
-            background: linear-gradient(135deg, #4CAF50, #45a049) !important;
-            color: white !important;
-            padding: 15px 30px !important;
-            text-align: center !important;
-            border-radius: 25px !important;
-            margin: 10px auto !important;
-            font-size: 18px !important;
-            font-weight: bold !important;
-            display: inline-block !important;
-            width: auto !important;
-            max-width: fit-content !important;
-            min-width: auto !important;
-            box-sizing: border-box !important;
-            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3) !important;
-            border: none !important;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            font-size: 18px;
+        }
+        
+        .calculate-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #2E7D32;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        
+        .item {
+            padding: 10px 0;
+        }
+        
+        .pulse-animation {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        /* Improved search suggestions */
+        .search-suggestions {
+            display: none;
+            position: absolute;
+            background: white;
+            border: 1px solid #ddd;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 9999;
+            width: 120%; /* 20% wider than the input */
+            margin-left: -10%; /* Center it */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .search-suggestion-category {
+            background: #f0f0f0;
+            padding: 8px 12px;
+            font-weight: bold;
+            color: #2E7D32;
+            font-size: 14px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .search-suggestion-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+        
+        .search-suggestion-item:hover {
+            background-color: #e8f5e9;
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            
+            .calculator, .header button, .btn-add, .btn-clear, .btn-print, .btn-example {
+                display: none !important;
+            }
+            
+            .total-button-v2 {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>🔧 افضل آئرن شاپ کیلکولیٹر</h1>
-        <h2>Afzal Iron Shop Calculator</h2>
-        <p><strong>Professional Material Calculator for Iron Shops</strong></p>
-        <p><strong>آئرن شاپ کے لیے پیشہ ورانہ مواد کیلکولیٹر</strong></p>
+        <h1 style="margin: 0;">افضل آئرن شاپ کیلکولیٹر</h1>
+        <h2 style="margin: 5px 0 0;">Afzal Iron Shop Calculator</h2>
     </div>
-
+    
     <div class="calculator">
-        <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #2196F3;">
-            <h3>📋 Instructions / ہدایات:</h3>
-            <ol>
-                <li><strong>Select Material</strong> from dropdown / <strong>مواد منتخب کریں</strong></li>
-                <li><strong>Enter Price per Unit</strong> in Rs. / <strong>فی یونٹ قیمت داخل کریں</strong></li>
+        <h2>Material Calculator / مٹیریل کیلکولیٹر</h2>
+        
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color: #2c3e50; margin: 0;">How to Use / استعمال کرنے کا طریقہ</h3>
+            <ol style="padding-left: 20px; margin-top: 10px;">
+                <li><strong>Select Material</strong> / <strong>مٹیریل منتخب کریں</strong></li>
+                <li><strong>Enter Price</strong> / <strong>قیمت داخل کریں</strong></li>
                 <li><strong>Enter Quantity</strong> / <strong>مقدار داخل کریں</strong></li>
                 <li><strong>Total calculates automatically</strong> / <strong>کل خودکار طور پر حساب ہو جائے گا</strong></li>
                 <li><strong>Click "Add New Item"</strong> for more materials / <strong>مزید مواد کے لیے نیا آئٹم شامل کریں</strong></li>
             </ol>
         </div>
         
-        <button onclick="addItem()" class="btn-add" style="
-            background: linear-gradient(135deg, #673AB7, #512DA8) !important;
-            color: white !important;
-            font-size: 18px !important;
-            padding: 15px 20px !important;
-            border-radius: 50px !important;
-            box-shadow: 0 4px 8px rgba(103, 58, 183, 0.3) !important;
-            margin: 15px auto !important;
-            display: block !important;
-            width: 100% !important;
-            animation: pulse 2s infinite !important;
-            transition: all 0.3s ease !important;
-        ">➕ Add New Item / نیا آئٹم شامل کریں</button>
+        <button onclick="addItem()" class="btn-add pulse-animation" style="background: linear-gradient(135deg, #4CAF50, #45a049);">
+            ➕ Add New Item / نیا آئٹم شامل کریں
+        </button>
         
         <div id="items-container">
             <!-- Items will be added here -->
@@ -664,46 +353,42 @@
 
         <div class="total-button-v2" id="grandTotal" style="
             background: linear-gradient(135deg, #4CAF50, #45a049) !important;
-            color: white !important;
-            padding: 15px 30px !important;
-            text-align: center !important;
-            border-radius: 25px !important;
-            margin: 10px auto !important;
-            font-size: 18px !important;
-            font-weight: bold !important;
-            display: inline-block !important;
-            width: auto !important;
-            box-sizing: border-box !important;
-            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3) !important;
-            border: none !important;
-            max-width: fit-content !important;
-            min-width: auto !important;
+            padding: 20px;
+            font-size: 24px;
         ">
-            کل رقم / Grand Total: Rs. 0.00
+            Grand Total / کل رقم: Rs. 0.00
         </div>
-        
-        <!-- Bottom Add Item Button for mobile usability -->
-        <button onclick="addItem()" class="btn-add" style="
-            margin: 20px auto !important;
-            display: block !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            background: linear-gradient(135deg, #673AB7, #512DA8) !important;
-            color: white !important;
-            font-size: 18px !important;
-            padding: 15px 20px !important;
-            border-radius: 50px !important;
-            box-shadow: 0 4px 8px rgba(103, 58, 183, 0.3) !important;
-            animation: pulse 2s infinite !important;
-            transition: all 0.3s ease !important;
-        ">➕ Add New Item / نیا آئٹم شامل کریں</button>
 
         <div style="text-align: center;">
             <button onclick="clearAll()" class="btn-clear">🗑️ Clear All / صاف کریں</button>
-            <button onclick="downloadPdfBill()" class="btn-download" style="background: linear-gradient(135deg, #D32F2F, #B71C1C); padding: 12px 20px;">📄 Download Bill PDF / بل پی ڈی ایف</button>
+            <button onclick="showBill()" class="btn-download" style="background: linear-gradient(135deg, #2E7D32, #1B5E20); padding: 12px 20px;">👁️ Show Bill / بل دیکھیں</button>
             <button onclick="window.print()" class="btn-print">🖨️ Print Bill / بل پرنٹ کریں</button>
             <button onclick="showExample()" class="btn-example">📋 Show Example / مثال دیکھیں</button>
         </div>
+        
+        <!-- Bill Modal - Hidden by default -->
+        <div id="billModal" class="modal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7);">
+            <div class="modal-content" style="background-color: #fff; margin: 5% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 800px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h2 style="margin: 0; color: #2E7D32;">Afzal Iron Shop Bill</h2>
+                    <span class="close-modal" onclick="closeBillModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+                </div>
+                
+                <div id="billContent" style="margin-top: 10px;">
+                    <!-- Bill content will be inserted here dynamically -->
+                </div>
+                
+                <div style="margin-top: 20px; text-align: center;">
+                    <button onclick="printBill()" class="btn-print" style="margin-right: 10px;">🖨️ Print Bill</button>
+                    <button onclick="closeBillModal()" class="btn-clear">Close</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Added duplicate Add Item button at bottom for better mobile UX -->
+        <button onclick="addItem()" class="btn-add pulse-animation" style="background: linear-gradient(135deg, #9C27B0, #673AB7); margin-top: 20px;">
+            ➕ Add New Item / نیا آئٹم شامل کریں
+        </button>
     </div>
 
     <script>
@@ -717,75 +402,91 @@
                 'سٹیل راڈ 12mm / Steel Rod 12mm - (Rs. 75-80 per piece)',
                 'سٹیل راڈ 16mm / Steel Rod 16mm - (Rs. 120-130 per piece)',
                 'سٹیل راڈ 20mm / Steel Rod 20mm - (Rs. 180-200 per piece)',
-                'سٹیل راڈ 25mm / Steel Rod 25mm - (Rs. 280-300 per piece)',
-                'سٹیل راڈ 32mm / Steel Rod 32mm - (Rs. 450-500 per piece)',
-                'سٹیل راڈ 40mm / Steel Rod 40mm - (Rs. 700-750 per piece)'
+                'سٹیل راڈ 25mm / Steel Rod 25mm - (Rs. 250-280 per piece)',
+                'سٹیل راڈ 32mm / Steel Rod 32mm - (Rs. 390-420 per piece)'
             ],
             'Iron Sheets / آئرن شیٹس': [
-                'آئرن شیٹ 18 گیج / Iron Sheet 18 Gauge - (Rs. 85-90 per kg)',
-                'آئرن شیٹ 20 گیج / Iron Sheet 20 Gauge - (Rs. 80-85 per kg)',
-                'آئرن شیٹ 22 گیج / Iron Sheet 22 Gauge - (Rs. 75-80 per kg)',
-                'آئرن شیٹ 24 گیج / Iron Sheet 24 Gauge - (Rs. 70-75 per kg)',
-                'گیلوانائزڈ شیٹ / Galvanized Sheet - (Rs. 95-100 per kg)',
-                'کولڈ رولڈ شیٹ / Cold Rolled Sheet - (Rs. 90-95 per kg)',
-                'ہاٹ رولڈ شیٹ / Hot Rolled Sheet - (Rs. 85-90 per kg)'
+                'آئرن شیٹ 18 گیج / Iron Sheet 18 Gauge - (Rs. 1350-1500 per sheet)',
+                'آئرن شیٹ 20 گیج / Iron Sheet 20 Gauge - (Rs. 1000-1150 per sheet)',
+                'آئرن شیٹ 22 گیج / Iron Sheet 22 Gauge - (Rs. 850-900 per sheet)',
+                'آئرن شیٹ 24 گیج / Iron Sheet 24 Gauge - (Rs. 700-750 per sheet)',
+                'آئرن شیٹ 26 گیج / Iron Sheet 26 Gauge - (Rs. 550-600 per sheet)',
+                'گیلوانائزڈ شیٹ 20 گیج / Galvanized Sheet 20 Gauge - (Rs. 1200-1300 per sheet)',
+                'گیلوانائزڈ شیٹ 22 گیج / Galvanized Sheet 22 Gauge - (Rs. 1000-1100 per sheet)',
+                'گیلوانائزڈ شیٹ 24 گیج / Galvanized Sheet 24 Gauge - (Rs. 800-900 per sheet)'
             ],
             'Angle Iron / اینگل آئرن': [
-                'اینگل آئرن 25x25x3mm / Angle Iron 25x25x3mm - (Rs. 65-70 per kg)',
-                'اینگل آئرن 30x30x3mm / Angle Iron 30x30x3mm - (Rs. 70-75 per kg)',
-                'اینگل آئرن 40x40x5mm / Angle Iron 40x40x5mm - (Rs. 75-80 per kg)',
-                'اینگل آئرن 50x50x6mm / Angle Iron 50x50x6mm - (Rs. 80-85 per kg)',
-                'اینگل آئرن 65x65x6mm / Angle Iron 65x65x6mm - (Rs. 85-90 per kg)',
-                'اینگل آئرن 75x75x8mm / Angle Iron 75x75x8mm - (Rs. 90-95 per kg)'
+                'اینگل آئرن 25x25x3mm / Angle Iron 25x25x3mm - (Rs. 120-130 per ft)',
+                'اینگل آئرن 25x25x5mm / Angle Iron 25x25x5mm - (Rs. 140-150 per ft)',
+                'اینگل آئرن 40x40x5mm / Angle Iron 40x40x5mm - (Rs. 180-200 per ft)',
+                'اینگل آئرن 50x50x6mm / Angle Iron 50x50x6mm - (Rs. 240-260 per ft)',
+                'اینگل آئرن 75x75x6mm / Angle Iron 75x75x6mm - (Rs. 370-400 per ft)',
+                'اینگل آئرن 75x75x8mm / Angle Iron 75x75x8mm - (Rs. 440-480 per ft)',
+                'اینگل آئرن 100x100x10mm / Angle Iron 100x100x10mm - (Rs. 680-730 per ft)'
             ],
             'Pipes / پائپس': [
-                'جی آئی پائپ 1/2 انچ / GI Pipe 1/2 inch - (Rs. 120-130 per foot)',
-                'جی آئی پائپ 3/4 انچ / GI Pipe 3/4 inch - (Rs. 150-160 per foot)',
-                'جی آئی پائپ 1 انچ / GI Pipe 1 inch - (Rs. 180-190 per foot)',
-                'جی آئی پائپ 1.5 انچ / GI Pipe 1.5 inch - (Rs. 280-300 per foot)',
-                'جی آئی پائپ 2 انچ / GI Pipe 2 inch - (Rs. 350-380 per foot)',
-                'ایم ایس پائپ / MS Pipe - (Rs. 95-105 per kg)',
-                'سکوائر پائپ / Square Pipe - (Rs. 100-110 per kg)'
+                'آئرن پائپ 1/2 انچ / Iron Pipe 1/2 inch - (Rs. 100-120 per ft)',
+                'آئرن پائپ 3/4 انچ / Iron Pipe 3/4 inch - (Rs. 130-150 per ft)',
+                'آئرن پائپ 1 انچ / Iron Pipe 1 inch - (Rs. 170-190 per ft)',
+                'آئرن پائپ 1.5 انچ / Iron Pipe 1.5 inch - (Rs. 220-250 per ft)',
+                'آئرن پائپ 2 انچ / Iron Pipe 2 inch - (Rs. 290-320 per ft)',
+                'آئرن پائپ 3 انچ / Iron Pipe 3 inch - (Rs. 450-500 per ft)',
+                'آئرن پائپ 4 انچ / Iron Pipe 4 inch - (Rs. 590-650 per ft)',
+                'جی آئی پائپ 1/2 انچ / GI Pipe 1/2 inch - (Rs. 140-160 per ft)',
+                'جی آئی پائپ 3/4 انچ / GI Pipe 3/4 inch - (Rs. 180-200 per ft)',
+                'جی آئی پائپ 1 انچ / GI Pipe 1 inch - (Rs. 230-250 per ft)',
+                'جی آئی پائپ 1.5 انچ / GI Pipe 1.5 inch - (Rs. 280-310 per ft)',
+                'جی آئی پائپ 2 انچ / GI Pipe 2 inch - (Rs. 350-380 per ft)'
             ],
             'Channels / چینلز': [
-                'چینل 75x40x5mm / Channel 75x40x5mm - (Rs. 75-80 per kg)',
-                'چینل 100x50x6mm / Channel 100x50x6mm - (Rs. 80-85 per kg)',
-                'چینل 125x65x6mm / Channel 125x65x6mm - (Rs. 85-90 per kg)',
-                'چینل 150x75x8mm / Channel 150x75x8mm - (Rs. 90-95 per kg)',
-                'چینل 200x100x8mm / Channel 200x100x8mm - (Rs. 95-100 per kg)'
+                'چینل 3 انچ / Channel 3 inch - (Rs. 320-350 per ft)',
+                'چینل 4 انچ / Channel 4 inch - (Rs. 410-450 per ft)',
+                'چینل 5 انچ / Channel 5 inch - (Rs. 520-570 per ft)',
+                'چینل 6 انچ / Channel 6 inch - (Rs. 640-700 per ft)',
+                'چینل 8 انچ / Channel 8 inch - (Rs. 900-980 per ft)',
+                'چینل 10 انچ / Channel 10 inch - (Rs. 1300-1400 per ft)'
             ],
             'Beams / بیمز': [
-                'آئی بیم 100mm / I-Beam 100mm - (Rs. 85-90 per kg)',
-                'آئی بیم 150mm / I-Beam 150mm - (Rs. 90-95 per kg)',
-                'آئی بیم 200mm / I-Beam 200mm - (Rs. 95-100 per kg)',
-                'آئی بیم 250mm / I-Beam 250mm - (Rs. 100-105 per kg)',
-                'ایچ بیم / H-Beam - (Rs. 105-110 per kg)'
+                'آئرن بیم 6 انچ / Iron Beam 6 inch - (Rs. 680-750 per ft)',
+                'آئرن بیم 8 انچ / Iron Beam 8 inch - (Rs. 950-1050 per ft)',
+                'آئرن بیم 10 انچ / Iron Beam 10 inch - (Rs. 1280-1400 per ft)',
+                'آئرن بیم 12 انچ / Iron Beam 12 inch - (Rs. 1550-1700 per ft)',
+                'آئرن بیم 18 انچ / Iron Beam 18 inch - (Rs. 2500-2700 per ft)',
+                'آئرن بیم 24 انچ / Iron Beam 24 inch - (Rs. 3500-3800 per ft)'
             ],
             'Flat Bars / فلیٹ بارز': [
-                'فلیٹ بار 25x3mm / Flat Bar 25x3mm - (Rs. 70-75 per kg)',
-                'فلیٹ بار 40x5mm / Flat Bar 40x5mm - (Rs. 75-80 per kg)',
-                'فلیٹ بار 50x6mm / Flat Bar 50x6mm - (Rs. 80-85 per kg)',
-                'فلیٹ بار 75x8mm / Flat Bar 75x8mm - (Rs. 85-90 per kg)',
-                'فلیٹ بار 100x10mm / Flat Bar 100x10mm - (Rs. 90-95 per kg)'
+                'فلیٹ بار 1 انچ x 3mm / Flat Bar 1 inch x 3mm - (Rs. 80-100 per ft)',
+                'فلیٹ بار 1.5 انچ x 3mm / Flat Bar 1.5 inch x 3mm - (Rs. 110-130 per ft)',
+                'فلیٹ بار 1.5 انچ x 5mm / Flat Bar 1.5 inch x 5mm - (Rs. 140-160 per ft)',
+                'فلیٹ بار 2 انچ x 5mm / Flat Bar 2 inch x 5mm - (Rs. 190-210 per ft)',
+                'فلیٹ بار 2 انچ x 8mm / Flat Bar 2 inch x 8mm - (Rs. 240-260 per ft)',
+                'فلیٹ بار 3 انچ x 5mm / Flat Bar 3 inch x 5mm - (Rs. 280-310 per ft)',
+                'فلیٹ بار 3 انچ x 8mm / Flat Bar 3 inch x 8mm - (Rs. 340-370 per ft)',
+                'فلیٹ بار 4 انچ x 8mm / Flat Bar 4 inch x 8mm - (Rs. 420-450 per ft)'
             ],
             'Wire & Mesh / تار اور جالی': [
-                'بائنڈنگ وائر / Binding Wire - (Rs. 110-120 per kg)',
-                'چکن میش / Chicken Mesh - (Rs. 95-105 per kg)',
-                'چین لنک / Chain Link - (Rs. 85-95 per kg)',
-                'بارب وائر / Barbed Wire - (Rs. 100-110 per kg)',
-                'ویلڈنگ وائر / Welding Wire - (Rs. 150-170 per kg)'
+                'بائنڈنگ وائر / Binding Wire - (Rs. 150-170 per kg)',
+                'جی آئی وائر / GI Wire - (Rs. 170-190 per kg)',
+                'چکن میش 1/2 انچ / Chicken Mesh 1/2 inch - (Rs. 40-45 per sq ft)',
+                'چکن میش 3/4 انچ / Chicken Mesh 3/4 inch - (Rs. 35-40 per sq ft)',
+                'چکن میش 1 انچ / Chicken Mesh 1 inch - (Rs. 30-35 per sq ft)',
+                'جالی 1/2 انچ / Wire Mesh 1/2 inch - (Rs. 50-60 per sq ft)',
+                'جالی 1 انچ / Wire Mesh 1 inch - (Rs. 40-50 per sq ft)',
+                'جالی 2 انچ / Wire Mesh 2 inch - (Rs. 35-40 per sq ft)'
             ]
         };
 
-        // Flatten all materials for easy searching
-        const allMaterials = [];
-        Object.values(materialCategories).forEach(category => {
-            allMaterials.push(...category);
-        });        function addItem() {
+        // Initialize with the first item
+        document.addEventListener('DOMContentLoaded', function() {
+            addItem();
+        });
+        
+        function addItem() {
             itemCount++;
-            const container = document.getElementById('items-container');
             
+            const itemsContainer = document.getElementById('items-container');
             const itemDiv = document.createElement('div');
+            itemDiv.className = 'item';
             itemDiv.id = `item-${itemCount}`;
             itemDiv.innerHTML = `
                 <hr style="margin: 20px 0; border: 2px solid #4CAF50;">
@@ -812,90 +513,233 @@
                             <select id="material-${itemCount}" onchange="selectMaterial(${itemCount}, this.value)" 
                                     style="font-size: 14px; position: relative; z-index: 1;">
                                 <option value="">منتخب کریں / Select Material</option>
-                                <optgroup label="🔩 Steel Rods / سٹیل راڈز">
-                                    ${materialCategories['Steel Rods / سٹیل راڈز'].map(m => `<option value="${m}">${m}</option>`).join('')}
-                                </optgroup>
-                                <optgroup label="📋 Iron Sheets / آئرن شیٹس">
-                                    ${materialCategories['Iron Sheets / آئرن شیٹس'].map(m => `<option value="${m}">${m}</option>`).join('')}
-                                </optgroup>
-                                <optgroup label="📐 Angle Iron / اینگل آئرن">
-                                    ${materialCategories['Angle Iron / اینگل آئرن'].map(m => `<option value="${m}">${m}</option>`).join('')}
-                                </optgroup>
-                                <optgroup label="🔧 Pipes / پائپس">
-                                    ${materialCategories['Pipes / پائپس'].map(m => `<option value="${m}">${m}</option>`).join('')}
-                                </optgroup>
-                                <optgroup label="📏 Channels / چینلز">
-                                    ${materialCategories['Channels / چینلز'].map(m => `<option value="${m}">${m}</option>`).join('')}
-                                </optgroup>
-                                <optgroup label="🏗️ Beams / بیمز">
-                                    ${materialCategories['Beams / بیمز'].map(m => `<option value="${m}">${m}</option>`).join('')}
-                                </optgroup>
-                                <optgroup label="📏 Flat Bars / فلیٹ بارز">
-                                    ${materialCategories['Flat Bars / فلیٹ بارز'].map(m => `<option value="${m}">${m}</option>`).join('')}
-                                </optgroup>
-                                <optgroup label="🔗 Wire & Mesh / تار اور جالی">
-                                    ${materialCategories['Wire & Mesh / تار اور جالی'].map(m => `<option value="${m}">${m}</option>`).join('')}
-                                </optgroup>
                             </select>
                         </div>
                         <div>
-                            <label>قیمت / Price per Unit (Rs.):</label>
-                            <input type="number" id="price-${itemCount}" placeholder="e.g. 50.00" step="0.01" onchange="calculate()">
+                            <label>قیمت / Price (Rs.):</label>
+                            <input type="number" id="price-${itemCount}" onkeyup="calculate()" onchange="calculate()" placeholder="Enter price / قیمت درج کریں">
                         </div>
                         <div>
                             <label>مقدار / Quantity:</label>
-                            <input type="number" id="quantity-${itemCount}" placeholder="e.g. 10" step="0.01" onchange="calculate()">
+                            <input type="number" id="quantity-${itemCount}" onkeyup="calculate()" onchange="calculate()" placeholder="Enter quantity / مقدار درج کریں">
                         </div>
                         <div>
-                            <label>کل / Total:</label>
-                            <div class="total" id="total-${itemCount}">Rs. 0.00</div>
+                            <label>کل / Total (Rs.):</label>
+                            <input type="text" id="total-${itemCount}" readonly style="background-color: #f0f0f0; font-weight: bold; color: #333; border: 2px solid #388E3C;">
                         </div>
-                        <div>
-                            <button class="remove-btn" onclick="removeItem(${itemCount})" title="Remove this item">✕</button>
-                        </div>
+                    </div>
+                    <div style="text-align: right; margin-top: 5px;">
+                        <button onclick="deleteItem(${itemCount})" class="btn-clear" style="padding: 8px 15px; margin: 0; background-color: #d32f2f;">
+                            🗑️ Delete Item / حذف کریں
+                        </button>
                     </div>
                 </div>
             `;
             
-            container.appendChild(itemDiv);
+            itemsContainer.appendChild(itemDiv);
+            
+            // Populate categories for the new item
+            populateAllCategories(document.getElementById(`material-${itemCount}`));
+            calculate();
+        }
+        
+        function populateAllCategories(select) {
+            // Clear existing options except the first one
+            select.innerHTML = '<option value="">منتخب کریں / Select Material</option>';
+            
+            // Add categories and their materials
+            Object.keys(materialCategories).forEach(categoryName => {
+                const optgroup = document.createElement('optgroup');
+                const icons = {
+                    'Steel Rods / سٹیل راڈز': '🔩',
+                    'Iron Sheets / آئرن شیٹس': '📋',
+                    'Angle Iron / اینگل آئرن': '📐',
+                    'Pipes / پائپس': '🔧',
+                    'Channels / چینلز': '📏',
+                    'Beams / بیمز': '🏗️',
+                    'Flat Bars / فلیٹ بارز': '📏',
+                    'Wire & Mesh / تار اور جالی': '🔗'
+                };
+                optgroup.label = `${icons[categoryName] || '📦'} ${categoryName}`;
+                
+                materialCategories[categoryName].forEach(material => {
+                    const option = document.createElement('option');
+                    option.value = material;
+                    option.textContent = material;
+                    optgroup.appendChild(option);
+                });
+                
+                select.appendChild(optgroup);
+            });
         }
 
-        function removeItem(id) {
-            const item = document.getElementById(`item-${id}`);
-            if (item) {
-                item.remove();
-                calculate();
+        function selectMaterial(itemId, material) {
+            const priceInput = document.getElementById(`price-${itemId}`);
+            const searchInput = document.getElementById(`material-search-${itemId}`);
+            
+            if (material) {
+                // Extract suggested price from material string (e.g., "Rs. 25-30 per piece")
+                const priceMatch = material.match(/\(Rs\.\s*(\d+)(?:-\d+)?\s*per/);
+                if (priceMatch && priceMatch[1] && !priceInput.value) {
+                    priceInput.value = priceMatch[1];
+                }
+                
+                // Update search input to show the selected material without price hints
+                const materialName = material.split(' - ')[0]; // Remove price info
+                searchInput.value = materialName;
+            } else {
+                searchInput.value = '';
             }
+            
+            calculate();
         }
-
+        
         function calculate() {
             let grandTotal = 0;
             
             for (let i = 1; i <= itemCount; i++) {
                 const priceInput = document.getElementById(`price-${i}`);
                 const quantityInput = document.getElementById(`quantity-${i}`);
-                const totalDiv = document.getElementById(`total-${i}`);
+                const totalInput = document.getElementById(`total-${i}`);
                 
-                if (priceInput && quantityInput && totalDiv) {
+                if (priceInput && quantityInput && totalInput) {
                     const price = parseFloat(priceInput.value) || 0;
                     const quantity = parseFloat(quantityInput.value) || 0;
                     const total = price * quantity;
                     
-                    totalDiv.textContent = `Rs. ${total.toFixed(2)}`;
+                    totalInput.value = total.toFixed(2);
                     grandTotal += total;
                 }
             }
             
-            document.getElementById('grandTotal').textContent = `کل رقم / Grand Total: Rs. ${grandTotal.toFixed(2)}`;
+            // Update grand total with animation
+            const grandTotalElement = document.getElementById('grandTotal');
+            grandTotalElement.innerHTML = `Grand Total / کل رقم: Rs. <span style="color: yellow; font-weight: bold;">${grandTotal.toFixed(2)}</span>`;
+            grandTotalElement.style.transition = 'background-color 0.3s';
+            grandTotalElement.style.backgroundColor = '#2E7D32';
+            setTimeout(() => {
+                grandTotalElement.style.backgroundColor = '';
+            }, 500);
         }
-
+        
+        function deleteItem(itemId) {
+            const item = document.getElementById(`item-${itemId}`);
+            if (item) {
+                item.remove();
+                calculate();
+            }
+        }
+        
         function clearAll() {
-            document.getElementById('items-container').innerHTML = '';
+            const itemsContainer = document.getElementById('items-container');
+            itemsContainer.innerHTML = '';
             itemCount = 0;
+            addItem();
             calculate();
-            addItem(); // Add one item automatically
+        }
+        
+        function resetSelection(itemId) {
+            const select = document.getElementById(`material-${itemId}`);
+            select.selectedIndex = 0;
+            
+            // Trigger calculation
+            calculate();
         }
 
+        // New Search Suggestions Functions
+        function showSearchSuggestions(itemId, searchTerm) {
+            const suggestionsContainer = document.getElementById(`search-suggestions-${itemId}`);
+            
+            if (searchTerm.length === 0) {
+                hideSearchSuggestions(itemId);
+                return;
+            }
+            
+            // Filter materials for suggestions
+            const suggestions = [];
+            const searchLower = searchTerm.toLowerCase();
+            
+            Object.keys(materialCategories).forEach(categoryName => {
+                const categoryMatches = [];
+                materialCategories[categoryName].forEach(material => {
+                    const materialLower = material.toLowerCase();
+                    if (materialLower.includes(searchLower) || 
+                        material.includes(searchTerm)) {
+                        categoryMatches.push(material);
+                    }
+                });
+                
+                if (categoryMatches.length > 0) {
+                    suggestions.push({
+                        category: categoryName,
+                        materials: categoryMatches.slice(0, 5) // Limit to 5 per category
+                    });
+                }
+            });
+            
+            // Build suggestions HTML
+            let suggestionsHTML = '';
+            suggestions.forEach(group => {
+                if (suggestionsHTML) suggestionsHTML += '<hr style="margin: 5px 0; border: 1px solid #f0f0f0;">';
+                suggestionsHTML += `<div class="search-suggestion-category">${group.category}</div>`;
+                group.materials.forEach(material => {
+                    const materialName = material.split(' - ')[0]; // Remove price info
+                    suggestionsHTML += `
+                        <div class="search-suggestion-item" 
+                             onmousedown="selectSuggestion(${itemId}, '${material}', '${materialName}')">
+                            ${material}
+                        </div>`;
+                });
+            });
+            
+            if (suggestions.length === 0) {
+                suggestionsHTML = `<div class="search-suggestion-item" style="color: #999;">No results for "${searchTerm}"</div>`;
+            }
+            
+            suggestionsContainer.innerHTML = suggestionsHTML;
+            suggestionsContainer.style.display = 'block';
+            
+            // Force high z-index to ensure it appears on top
+            suggestionsContainer.style.zIndex = '9999';
+        }
+
+        function hideSearchSuggestions(itemId) {
+            setTimeout(() => {
+                const suggestionsContainer = document.getElementById(`search-suggestions-${itemId}`);
+                const searchInput = document.getElementById(`material-search-${itemId}`);
+                
+                // Only hide if the input doesn't have focus or is empty
+                if (suggestionsContainer && (document.activeElement !== searchInput || !searchInput.value.trim())) {
+                    suggestionsContainer.style.display = 'none';
+                }
+            }, 200); // Delay to allow click to register
+        }
+
+        function selectSuggestion(itemId, fullMaterial, displayName) {
+            const searchInput = document.getElementById(`material-search-${itemId}`);
+            const select = document.getElementById(`material-${itemId}`);
+            
+            // Set the search input to show selected material
+            searchInput.value = displayName;
+            
+            // Set the dropdown to the selected material
+            select.value = fullMaterial;
+            
+            // Keep focus on the input for better UX
+            searchInput.focus();
+            
+            // Trigger calculation
+            calculate();
+            
+            // Hide suggestions after a short delay to prevent flicker
+            setTimeout(() => {
+                const suggestionsContainer = document.getElementById(`search-suggestions-${itemId}`);
+                if (suggestionsContainer) {
+                    suggestionsContainer.style.display = 'none';
+                }
+            }, 100);
+        }
+        
         function showExample() {
             // Clear all first
             clearAll();
@@ -928,104 +772,10 @@
                 }, 100);
             }, 100);
         }
-
-        function downloadBill() {
-            // Get current date and time
-            const now = new Date();
-            const date = now.toLocaleDateString('en-GB');
-            const time = now.toLocaleTimeString('en-GB', { hour12: false });
-            
-            // Generate readable bill content
-            let billContent = `
-************************************************************
-                    AFZAL IRON SHOP
-                     افضل آئرن شاپ
-************************************************************
-Date: ${date}                    Time: ${time}
-************************************************************
-                        BILL / بل
-************************************************************
-
-ITEMS PURCHASED:
-`;
-
-            let itemFound = false;
-            let grandTotal = 0;
-
-            // Add items to bill
-            for (let i = 1; i <= itemCount; i++) {
-                const materialSelect = document.getElementById(`material-${i}`);
-                const priceInput = document.getElementById(`price-${i}`);
-                const quantityInput = document.getElementById(`quantity-${i}`);
-                
-                if (materialSelect && priceInput && quantityInput) {
-                    const material = materialSelect.value;
-                    const price = parseFloat(priceInput.value) || 0;
-                    const quantity = parseFloat(quantityInput.value) || 0;
-                    const total = price * quantity;
-                    
-                    if (material && price > 0 && quantity > 0) {
-                        itemFound = true;
-                        grandTotal += total;
-                        
-                        // Clean material name (remove price hints)
-                        const cleanMaterial = material.split(' - ')[0];
-                        
-                        billContent += `
-${i}. Material: ${cleanMaterial}
-   Unit Price: Rs. ${price.toFixed(2)}
-   Quantity: ${quantity}
-   Line Total: Rs. ${total.toFixed(2)}
-   ----------------------------------------------------`;
-                    }
-                }
-            }
-
-            if (!itemFound) {
-                alert('No items found! Please add some materials first.\nکوئی آئٹم نہیں ملا! پہلے کچھ مواد شامل کریں۔');
-                return;
-            }
-
-            // Add grand total
-            billContent += `
-
-************************************************************
-                    GRAND TOTAL: Rs. ${grandTotal.toFixed(2)}
-                     کل رقم: Rs. ${grandTotal.toFixed(2)}
-************************************************************
-
-Thank you for your business!
-آپ کے کاروبار کے لیے شکریہ!
-
-Contact: Afzal Iron Shop
-Address: [Your Shop Address]
-Phone: [Your Phone Number]
-
-Generated by Afzal Iron Shop Calculator
-************************************************************
-`;
-
-            // Create and download file with proper encoding
-            const blob = new Blob([billContent], { type: 'text/plain;charset=utf-8' });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `Afzal-Iron-Shop-Bill-${date.replace(/\//g, '-')}-${time.replace(/:/g, '-')}.txt`;
-            
-            // Trigger download
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-            
-            // Show success message
-            alert('Bill downloaded successfully! / بل کامیابی سے ڈاؤن لوڈ ہو گیا!');
-            
-            // Save to localStorage as backup
-            saveBillToStorage(billContent, grandTotal);
-        }
-
-        function downloadPdfBill() {
+        
+        // Note: downloadBill function replaced with the new showBill function
+        
+        function showBill() {
             // Check if any items have been added
             let itemFound = false;
             let grandTotal = 0;
@@ -1035,7 +785,8 @@ Generated by Afzal Iron Shop Calculator
             const now = new Date();
             const date = now.toLocaleDateString('en-GB');
             const time = now.toLocaleTimeString('en-GB', { hour12: false });
-
+            const billNumber = Date.now().toString().substring(7);
+            
             // Collect items data
             for (let i = 1; i <= itemCount; i++) {
                 const materialSelect = document.getElementById(`material-${i}`);
@@ -1070,214 +821,103 @@ Generated by Afzal Iron Shop Calculator
                 alert('No items found! Please add some materials first.\nکوئی آئٹم نہیں ملا! پہلے کچھ مواد شامل کریں۔');
                 return;
             }
-
-            // Create PDF with maximum quality settings
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({
-                orientation: "portrait",
-                unit: "mm",
-                format: "a4",
-                compress: false,
-                precision: 16,
-                hotfixes: ["px_scaling"]
+            
+            // Generate bill HTML
+            let billHTML = `
+                <div class="bill-header">
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <h2 style="color: #2E7D32; margin: 0;">AFZAL IRON SHOP</h2>
+                        <div style="font-size: 16px; margin-top: 5px;">افضل آئرن شاپ</div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                        <div>Date: ${date}</div>
+                        <div>Time: ${time}</div>
+                    </div>
+                    <div>Bill #: ${billNumber}</div>
+                </div>
+                
+                <table class="bill-table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Material</th>
+                            <th>Unit Price (Rs.)</th>
+                            <th>Quantity</th>
+                            <th>Total (Rs.)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            // Add items to the table
+            itemsList.forEach(item => {
+                billHTML += `
+                    <tr>
+                        <td>${item.id}</td>
+                        <td>${item.material}</td>
+                        <td>${item.price.toFixed(2)}</td>
+                        <td>${item.quantity}</td>
+                        <td>${item.total.toFixed(2)}</td>
+                    </tr>
+                `;
             });
             
-            // Create a cleaner layout with better margins
-            const margin = 15; // Page margin
-            const pageWidth = 210; // A4 width
-            const contentWidth = pageWidth - (margin * 2);
-            
-            // Set initial font settings
-            doc.setFont("Helvetica", "bold");
-            doc.setFontSize(18);
-            
-            // Add header with better styling
-            doc.setTextColor(0, 102, 51); // Dark green color
-            doc.text("AFZAL IRON SHOP", pageWidth/2, margin + 5, { align: "center" });
-            doc.setFontSize(14);
-            doc.text("افضل آئرن شاپ", pageWidth/2, margin + 12, { align: "center" });
-            
-            // Add green divider line
-            doc.setDrawColor(0, 102, 51);
-            doc.setLineWidth(0.5);
-            doc.line(margin, margin + 15, pageWidth - margin, margin + 15);
-            
-            // Add bill details with cleaner formatting
-            const billInfoY = margin + 22;
-            doc.setTextColor(0, 0, 0);
-            doc.setFontSize(10);
-            doc.setFont("Helvetica", "normal");
-            
-            // Left-aligned bill details
-            doc.text(`Date: ${date}`, margin, billInfoY);
-            doc.text(`Bill #: ${Date.now().toString().substring(7)}`, margin, billInfoY + 7);
-            
-            // Right-aligned time
-            doc.text(`Time: ${time}`, pageWidth - margin, billInfoY, { align: "right" });
-            
-            // Define column positions and widths for better structure
-            const colPos = {
-                no: margin + 5,
-                material: margin + 20,
-                price: pageWidth - margin - 75,
-                qty: pageWidth - margin - 40,
-                total: pageWidth - margin - 10
-            };
-            
-            // Add table header with cleaner styling
-            const headerY = billInfoY + 15;
-            doc.setFillColor(235, 245, 235);
-            doc.rect(margin, headerY, contentWidth, 8, "F");
-            
-            doc.setFont("Helvetica", "bold");
-            doc.setFontSize(10);
-            doc.setTextColor(0, 80, 40);
-            
-            // Add column headers
-            doc.text("No.", colPos.no, headerY + 5.5);
-            doc.text("Material", colPos.material, headerY + 5.5);
-            doc.text("Unit Price (Rs.)", colPos.price, headerY + 5.5, { align: "right" });
-            doc.text("Quantity", colPos.qty, headerY + 5.5, { align: "right" });
-            doc.text("Total (Rs.)", colPos.total, headerY + 5.5, { align: "right" });
-            
-            // Initialize item rendering
-            let y = headerY + 12; // Start position for items
-            const itemHeight = 8; // Height per item
-            
-            // Style for item rows
-            doc.setTextColor(0, 0, 0);
-            doc.setFontSize(9.5);
-            doc.setLineWidth(0.1);
-            
-            // Render items with improved clarity
-            itemsList.forEach((item, index) => {
-                // Add zebra striping with subtle effect
-                if (index % 2 === 0) {
-                    doc.setFillColor(248, 248, 248);
-                    doc.rect(margin, y - 3, contentWidth, itemHeight, "F");
-                }
+            // Add grand total
+            billHTML += `
+                    <tr class="bill-total">
+                        <td colspan="4" style="text-align: right; padding-right: 20px;">Grand Total:</td>
+                        <td>Rs. ${grandTotal.toFixed(2)}</td>
+                    </tr>
+                </tbody>
+                </table>
                 
-                doc.setFont("Helvetica", "normal");
-                
-                // Item number
-                doc.text(item.id.toString(), colPos.no, y);
-                
-                // Material name with proper truncation
-                const materialName = item.material;
-                const maxLength = 35;
-                if (materialName.length > maxLength) {
-                    doc.text(materialName.substring(0, maxLength - 3) + "...", colPos.material, y);
-                } else {
-                    doc.text(materialName, colPos.material, y);
-                }
-                
-                // Price, quantity and total - right aligned
-                doc.text(item.price.toFixed(2), colPos.price, y, { align: "right" });
-                doc.text(item.quantity.toString(), colPos.qty, y, { align: "right" });
-                
-                // Make total bold
-                doc.setFont("Helvetica", "bold");
-                doc.text(item.total.toFixed(2), colPos.total, y, { align: "right" });
-                
-                // Row separator - subtle line
-                doc.setDrawColor(220, 220, 220);
-                doc.line(margin, y + 3, pageWidth - margin, y + 3);
-                
-                // Move to next row
-                y += itemHeight;
-                
-                // Add new page if needed
-                if (y > pageWidth - 40) {
-                    doc.addPage();
-                    
-                    // Add smaller header on continuation page
-                    doc.setFont("Helvetica", "bold");
-                    doc.setFontSize(14);
-                    doc.setTextColor(0, 102, 51);
-                    doc.text("AFZAL IRON SHOP - Bill Continued", pageWidth/2, margin + 5, { align: "center" });
-                    
-                    // Add green line
-                    doc.setDrawColor(0, 102, 51);
-                    doc.setLineWidth(0.5);
-                    doc.line(margin, margin + 10, pageWidth - margin, margin + 10);
-                    
-                    // Repeat table headers
-                    const headerY = margin + 15;
-                    doc.setFillColor(235, 245, 235);
-                    doc.rect(margin, headerY, contentWidth, 8, "F");
-                    
-                    doc.setFontSize(10);
-                    doc.text("No.", colPos.no, headerY + 5.5);
-                    doc.text("Material", colPos.material, headerY + 5.5);
-                    doc.text("Unit Price (Rs.)", colPos.price, headerY + 5.5, { align: "right" });
-                    doc.text("Quantity", colPos.qty, headerY + 5.5, { align: "right" });
-                    doc.text("Total (Rs.)", colPos.total, headerY + 5.5, { align: "right" });
-                    
-                    // Reset for items
-                    doc.setFont("Helvetica", "normal");
-                    doc.setTextColor(0, 0, 0);
-                    doc.setFontSize(9.5);
-                    
-                    y = headerY + 12; // Reset y position for next page
-                }
-            });
+                <div class="bill-footer">
+                    <p>Thank you for your business! / آپ کے کاروبار کے لیے شکریہ!</p>
+                    <p>Contact: Afzal Iron Shop</p>
+                    <p>Address: Main Market, Lahore, Pakistan</p>
+                    <p>Phone: +92 3XX XXXXXXX</p>
+                    <p style="font-size: 10px; color: #999; margin-top: 15px;">Generated by Afzal Iron Shop Calculator</p>
+                </div>
+            `;
             
-            // Add a clean separator above the total
-            doc.setDrawColor(0, 102, 51);
-            doc.setLineWidth(0.5);
-            doc.line(margin, y + 3, pageWidth - margin, y + 3);
-            
-            // Create a styled total section
-            const totalY = y + 8;
-            doc.setFillColor(235, 245, 235);
-            doc.rect(colPos.price - 20, totalY - 4, (colPos.total - colPos.price) + 30, 10, "F");
-            
-            // Add the grand total text
-            doc.setFont("Helvetica", "bold");
-            doc.setFontSize(11);
-            doc.setTextColor(0, 80, 40);
-            doc.text("Grand Total:", colPos.price + 15, totalY + 2);
-            doc.text(`Rs. ${grandTotal.toFixed(2)}`, colPos.total, totalY + 2, { align: "right" });
-            
-            // Add a clean footer section
-            // Calculate footer position - ensure it's at bottom if page has few items
-            const footerY = Math.max(y + 20, pageWidth + 30);
-            
-            // Add footer separator line
-            doc.setDrawColor(0, 102, 51);
-            doc.setLineWidth(0.5);
-            doc.line(margin, footerY, pageWidth - margin, footerY);
-            
-            // Add thank you message
-            doc.setFont("Helvetica", "normal");
-            doc.setTextColor(0, 0, 0);
-            doc.setFontSize(10);
-            doc.text("Thank you for your business! / آپ کے کاروبار کے لیے شکریہ!", pageWidth/2, footerY + 8, { align: "center" });
-            
-            // Contact information block
-            doc.setFontSize(9);
-            doc.text("Contact: Afzal Iron Shop", pageWidth/2, footerY + 15, { align: "center" });
-            doc.text("Address: Main Market, Lahore, Pakistan", pageWidth/2, footerY + 21, { align: "center" });
-            doc.text("Phone: +92 3XX XXXXXXX", pageWidth/2, footerY + 27, { align: "center" });
-            
-            // Add subtle generator info at bottom
-            doc.setFontSize(7);
-            doc.setTextColor(120, 120, 120);
-            doc.text("Generated by Afzal Iron Shop Calculator", pageWidth/2, footerY + 38, { align: "center" });
-            
-            // Add timestamp at bottom of the page
-            doc.text(`Generated on: ${date} at ${time}`, pageWidth - margin, 285 - 5, { align: "right" });
-            
-            // Save PDF with clear file naming
-            const fileName = `Afzal-Iron-Shop-Bill-${date.replace(/\//g, '-')}.pdf`;
-            doc.save(fileName);
-            
-            // Show success message
-            alert('Bill PDF downloaded successfully! / بل پی ڈی ایف کامیابی سے ڈاؤن لوڈ ہو گیا!');
+            // Display the bill in the modal
+            document.getElementById('billContent').innerHTML = billHTML;
+            document.getElementById('billModal').style.display = 'block';
             
             // Save to localStorage as backup
-            saveBillToStorage(doc.output(), grandTotal);
+            saveBillToStorage(billHTML, grandTotal);
         }
+        
+        function closeBillModal() {
+            document.getElementById('billModal').style.display = 'none';
+        }
+        
+        function printBill() {
+            const printContent = document.getElementById('billContent').innerHTML;
+            const originalContent = document.body.innerHTML;
+            
+            document.body.innerHTML = `
+                <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+                    ${printContent}
+                </div>
+            `;
+            
+            window.print();
+            document.body.innerHTML = originalContent;
+            
+            // Re-attach event handlers that were lost when innerHTML was replaced
+            setTimeout(() => {
+                document.querySelectorAll('.search-suggestions-container').forEach(el => {
+                    // Re-attach any event listeners as needed
+                });
+                
+                // Show the modal again
+                document.getElementById('billModal').style.display = 'block';
+            }, 100);
+        }
+        
+        // Note: downloadPdfBill function removed and replaced with the new showBill function
 
         function saveBillToStorage(billContent, total) {
             try {
@@ -1387,296 +1027,14 @@ Generated by Afzal Iron Shop Calculator
             }
         }
 
-        function showMaterialDropdown(itemId) {
-            const select = document.getElementById(`material-${itemId}`);
-            const searchInput = document.getElementById(`material-search-${itemId}`);
-            
-            if (searchInput.value === '') {
-                populateAllCategories(select);
-            }
-        }
-
-        function populateAllCategories(select) {
-            select.innerHTML = '<option value="">منتخب کریں / Select Material</option>';
-            
-            Object.keys(materialCategories).forEach(categoryName => {
-                const optgroup = document.createElement('optgroup');
-                const icons = {
-                    'Steel Rods / سٹیل راڈز': '🔩',
-                    'Iron Sheets / آئرن شیٹس': '📋',
-                    'Angle Iron / اینگل آئرن': '📐',
-                    'Pipes / پائپس': '🔧',
-                    'Channels / چینلز': '📏',
-                    'Beams / بیمز': '🏗️',
-                    'Flat Bars / فلیٹ بارز': '📏',
-                    'Wire & Mesh / تار اور جالی': '🔗'
-                };
-                optgroup.label = `${icons[categoryName] || '📦'} ${categoryName}`;
-                
-                materialCategories[categoryName].forEach(material => {
-                    const option = document.createElement('option');
-                    option.value = material;
-                    option.textContent = material;
-                    optgroup.appendChild(option);
-                });
-                
-                select.appendChild(optgroup);
-            });
-        }
-
-        function selectMaterial(itemId, value) {
-            // When user selects from dropdown, update search box only if there's a selection
-            const searchInput = document.getElementById(`material-search-${itemId}`);
-            if (value) {
-                // Extract material name without price info for search field
-                const materialName = value.split(' - ')[0];
-                searchInput.value = materialName;
-            } else {
-                // Clear search box if no selection
-                searchInput.value = '';
-            }
-            // Always recalculate when selection changes
-            calculate();
-        }
-
-        function resetSelection(itemId) {
-            // Reset dropdown selection when user types in search box
-            const select = document.getElementById(`material-${itemId}`);
-            select.value = '';
-        }
-
-        // New Search Suggestions Functions
-        function showSearchSuggestions(itemId, searchTerm) {
-            const suggestionsContainer = document.getElementById(`search-suggestions-${itemId}`);
-            
-            if (!searchTerm || searchTerm.length === 0) {
-                suggestionsContainer.innerHTML = '';
-                suggestionsContainer.style.display = 'none';
-                return;
-            }
-            
-            // Filter materials for suggestions
-            const suggestions = [];
-            const searchLower = searchTerm.toLowerCase();
-            
-            Object.keys(materialCategories).forEach(categoryName => {
-                const categoryMatches = [];
-                materialCategories[categoryName].forEach(material => {
-                    const materialLower = material.toLowerCase();
-                    if (materialLower.includes(searchLower) || 
-                        material.includes(searchTerm)) {
-                        categoryMatches.push(material);
-                    }
-                });
-                
-                if (categoryMatches.length > 0) {
-                    suggestions.push({
-                        category: categoryName,
-                        materials: categoryMatches.slice(0, 5) // Limit to 5 per category
-                    });
-                }
-            });
-            
-            // Build suggestions HTML
-            let suggestionsHTML = '';
-            suggestions.forEach(group => {
-                if (suggestionsHTML) suggestionsHTML += '<hr style="margin: 5px 0; border: 1px solid #f0f0f0;">';
-                suggestionsHTML += `<div class="search-suggestion-category">${group.category}</div>`;
-                group.materials.forEach(material => {
-                    const materialName = material.split(' - ')[0]; // Remove price info
-                    suggestionsHTML += `
-                        <div class="search-suggestion-item" 
-                             onmousedown="selectSuggestion(${itemId}, '${material}', '${materialName}')">
-                            ${material}
-                        </div>`;
-                });
-            });
-            
-            if (suggestions.length === 0) {
-                suggestionsHTML = `<div class="search-suggestion-item" style="color: #999;">No results for "${searchTerm}"</div>`;
-            }
-            
-            suggestionsContainer.innerHTML = suggestionsHTML;
-            suggestionsContainer.style.display = 'block';
-            
-            // Force the suggestions to appear in front of everything
-            suggestionsContainer.style.zIndex = '9999';
-            
-            // Bring container to front
-            const searchContainer = document.getElementById(`material-search-${itemId}`).parentNode;
-            if (searchContainer) {
-                searchContainer.style.zIndex = '9000';
-            }
-        }
-
-        function hideSearchSuggestions(itemId) {
-            setTimeout(() => {
-                const suggestionsContainer = document.getElementById(`search-suggestions-${itemId}`);
-                const searchInput = document.getElementById(`material-search-${itemId}`);
-                
-                // Only hide if the input doesn't have focus or is empty
-                if (suggestionsContainer && (document.activeElement !== searchInput || !searchInput.value.trim())) {
-                    suggestionsContainer.style.display = 'none';
-                }
-            }, 200); // Delay to allow click to register
-        }
-
-        function selectSuggestion(itemId, fullMaterial, displayName) {
-            const searchInput = document.getElementById(`material-search-${itemId}`);
-            const select = document.getElementById(`material-${itemId}`);
-            
-            // Set the search input to show selected material
-            searchInput.value = displayName;
-            
-            // Set the dropdown to the selected material
-            select.value = fullMaterial;
-            
-            // If the select doesn't have this exact value, find closest match
-            if (select.value !== fullMaterial) {
-                // Find and select the closest match in the dropdown
-                for (let i = 0; i < select.options.length; i++) {
-                    if (select.options[i].value === fullMaterial || 
-                        select.options[i].value.includes(displayName) || 
-                        displayName.includes(select.options[i].value)) {
-                        select.selectedIndex = i;
-                        break;
-                    }
-                }
-            }
-            
-            // Hide suggestions
-            const suggestionsContainer = document.getElementById(`search-suggestions-${itemId}`);
-            suggestionsContainer.style.display = 'none';
-            
-            // Trigger calculation
-            calculate();
-            
-            // Focus back on input and move to the next item
-            searchInput.focus();
-        }
-
-        // Add first item automatically
-        addItem();
-    </script>
-    
-    <!-- PWA Installation Script -->
-    <script>
-        // Register Service Worker
+        // Service Worker Registration for PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then((registration) => {
-                        console.log('SW registered: ', registration);
-                    })
-                    .catch((registrationError) => {
-                        console.log('SW registration failed: ', registrationError);
-                    });
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed: ', err));
             });
         }
-
-        // PWA Install Button Functionality
-        let deferredPrompt;
-        const installButton = document.createElement('button');
-        installButton.textContent = '📱 Install App / ایپ انسٹال کریں';
-        installButton.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #4CAF50, #45a049);
-            color: white;
-            border: none;
-            padding: 15px 20px;
-            border-radius: 50px;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            cursor: pointer;
-            z-index: 1000;
-            font-size: 14px;
-            display: none;
-            animation: pulse 2s infinite;
-        `;
-
-        // Add CSS for pulse animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes pulse {
-                0% { transform: scale(1); }
-                50% { transform: scale(1.05); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
-                100% { transform: scale(1); }
-            }
-        `;
-        document.head.appendChild(style);
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent Chrome 67 and earlier from automatically showing the prompt
-            e.preventDefault();
-            // Stash the event so it can be triggered later
-            deferredPrompt = e;
-            // Show install button
-            installButton.style.display = 'block';
-            document.body.appendChild(installButton);
-        });
-
-        installButton.addEventListener('click', (e) => {
-            // Hide the button
-            installButton.style.display = 'none';
-            // Show the prompt
-            deferredPrompt.prompt();
-            // Wait for the user to respond to the prompt
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    console.log('User accepted the A2HS prompt');
-                    alert('App installing... Check your home screen! / ایپ انسٹال ہو رہا ہے... اپنی ہوم سکرین چیک کریں!');
-                } else {
-                    console.log('User dismissed the A2HS prompt');
-                }
-                deferredPrompt = null;
-            });
-        });
-
-        // Show install instructions for iOS
-        function isIOS() {
-            return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        }
-
-        if (isIOS()) {
-            const iosInstallButton = document.createElement('div');
-            iosInstallButton.innerHTML = `
-                <div style="position: fixed; bottom: 20px; left: 20px; background: rgba(0,0,0,0.8); color: white; padding: 15px; border-radius: 10px; font-size: 12px; max-width: 250px; z-index: 1000;">
-                    📱 <strong>Install App:</strong><br>
-                    Tap <strong>Share</strong> button → <strong>Add to Home Screen</strong><br>
-                    <button onclick="this.parentElement.style.display='none'" style="background: #4CAF50; color: white; border: none; padding: 5px 10px; border-radius: 5px; margin-top: 10px;">Got it!</button>
-                </div>
-            `;
-            document.body.appendChild(iosInstallButton);
-        }
-        
-        // NUCLEAR CACHE BUSTER - Force Grand Total to correct size
-        window.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                const grandTotal = document.getElementById('grandTotal');
-                if (grandTotal) {
-                    // Force override all styles
-                    grandTotal.style.cssText = `
-                        background: linear-gradient(135deg, #4CAF50, #45a049) !important;
-                        color: white !important;
-                        padding: 15px 30px !important;
-                        text-align: center !important;
-                        border-radius: 25px !important;
-                        margin: 10px auto !important;
-                        font-size: 18px !important;
-                        font-weight: bold !important;
-                        display: inline-block !important;
-                        width: auto !important;
-                        max-width: fit-content !important;
-                        min-width: auto !important;
-                        box-sizing: border-box !important;
-                        box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3) !important;
-                        border: none !important;
-                    `;
-                }
-            }, 100);
-        });
     </script>
 </body>
 </html>
