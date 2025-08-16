@@ -654,10 +654,12 @@
                         <div>
                             <label>مواد / Material:</label>
                             <input type="text" id="material-search-${itemCount}" placeholder="Type to search materials..." 
-                                   onkeyup="searchMaterials(${itemCount}, this.value)" 
+                                   onkeyup="searchMaterials(${itemCount}, this.value); resetSelection(${itemCount})" 
+                                   oninput="resetSelection(${itemCount})"
                                    onfocus="showMaterialDropdown(${itemCount})"
                                    style="margin-bottom: 5px;">
-                            <select id="material-${itemCount}" onchange="selectMaterial(${itemCount}, this.value)" style="font-size: 14px;">
+                            <select id="material-${itemCount}" onchange="selectMaterial(${itemCount}, this.value)" 
+                                    style="font-size: 14px;">
                                 <option value="">منتخب کریں / Select Material</option>
                                 <optgroup label="🔩 Steel Rods / سٹیل راڈز">
                                     ${materialCategories['Steel Rods / سٹیل راڈز'].map(m => `<option value="${m}">${m}</option>`).join('')}
@@ -896,25 +898,72 @@
             // Clear existing options
             select.innerHTML = '<option value="">منتخب کریں / Select Material</option>';
             
-            // Filter materials based on search term
-            const filteredMaterials = allMaterials.filter(material => 
-                material.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                material.includes(searchTerm)
-            );
+            // Improved filtering - search in both English and Urdu, and in material details
+            const filteredMaterials = [];
+            const searchLower = searchTerm.toLowerCase();
             
-            // Add filtered materials
-            filteredMaterials.forEach(material => {
-                const option = document.createElement('option');
-                option.value = material;
-                option.textContent = material;
-                select.appendChild(option);
+            Object.keys(materialCategories).forEach(categoryName => {
+                materialCategories[categoryName].forEach(material => {
+                    // Search in material name, category name, and common terms
+                    const materialLower = material.toLowerCase();
+                    const categoryLower = categoryName.toLowerCase();
+                    
+                    // Check if search term matches:
+                    // 1. Material name
+                    // 2. Category name  
+                    // 3. Size/dimensions (like 12mm, 22 gauge, etc.)
+                    // 4. Common terms (steel, iron, rod, sheet, etc.)
+                    if (materialLower.includes(searchLower) || 
+                        categoryLower.includes(searchLower) ||
+                        material.includes(searchTerm) ||
+                        categoryName.includes(searchTerm)) {
+                        filteredMaterials.push({
+                            material: material,
+                            category: categoryName
+                        });
+                    }
+                });
+            });
+            
+            // Group by category for better organization
+            const groupedResults = {};
+            filteredMaterials.forEach(item => {
+                if (!groupedResults[item.category]) {
+                    groupedResults[item.category] = [];
+                }
+                groupedResults[item.category].push(item.material);
+            });
+            
+            // Add grouped results to select
+            Object.keys(groupedResults).forEach(categoryName => {
+                const optgroup = document.createElement('optgroup');
+                const icons = {
+                    'Steel Rods / سٹیل راڈز': '🔩',
+                    'Iron Sheets / آئرن شیٹس': '📋',
+                    'Angle Iron / اینگل آئرن': '📐',
+                    'Pipes / پائپس': '🔧',
+                    'Channels / چینلز': '📏',
+                    'Beams / بیمز': '🏗️',
+                    'Flat Bars / فلیٹ بارز': '📏',
+                    'Wire & Mesh / تار اور جالی': '🔗'
+                };
+                optgroup.label = `${icons[categoryName] || '📦'} ${categoryName}`;
+                
+                groupedResults[categoryName].forEach(material => {
+                    const option = document.createElement('option');
+                    option.value = material;
+                    option.textContent = material;
+                    optgroup.appendChild(option);
+                });
+                
+                select.appendChild(optgroup);
             });
             
             // Show message if no results
             if (filteredMaterials.length === 0) {
                 const option = document.createElement('option');
                 option.value = '';
-                option.textContent = 'No materials found / کوئی مواد نہیں ملا';
+                option.textContent = `No results for "${searchTerm}" / "${searchTerm}" کے لیے کوئی نتیجہ نہیں`;
                 option.disabled = true;
                 select.appendChild(option);
             }
@@ -958,13 +1007,24 @@
         }
 
         function selectMaterial(itemId, value) {
+            // When user selects from dropdown, update search box only if there's a selection
             const searchInput = document.getElementById(`material-search-${itemId}`);
             if (value) {
                 // Extract material name without price info for search field
                 const materialName = value.split(' - ')[0];
                 searchInput.value = materialName;
+            } else {
+                // Clear search box if no selection
+                searchInput.value = '';
             }
+            // Always recalculate when selection changes
             calculate();
+        }
+
+        function resetSelection(itemId) {
+            // Reset dropdown selection when user types in search box
+            const select = document.getElementById(`material-${itemId}`);
+            select.value = '';
         }
 
         // Add first item automatically
