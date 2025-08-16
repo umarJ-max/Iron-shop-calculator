@@ -490,6 +490,25 @@
             display: inline-block !important;
             max-width: fit-content !important;
         }
+        
+        /* NEW CLASS - Bypass all cache issues */
+        .total-button-v2 {
+            background: linear-gradient(135deg, #4CAF50, #45a049) !important;
+            color: white !important;
+            padding: 15px 30px !important;
+            text-align: center !important;
+            border-radius: 25px !important;
+            margin: 10px auto !important;
+            font-size: 18px !important;
+            font-weight: bold !important;
+            display: inline-block !important;
+            width: auto !important;
+            max-width: fit-content !important;
+            min-width: auto !important;
+            box-sizing: border-box !important;
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3) !important;
+            border: none !important;
+        }
     </style>
 </head>
 <body>
@@ -518,7 +537,23 @@
             <!-- Items will be added here -->
         </div>
 
-        <div class="grand-total" id="grandTotal" style="background: linear-gradient(135deg, #4CAF50, #45a049);">
+        <div class="total-button-v2" id="grandTotal" style="
+            background: linear-gradient(135deg, #4CAF50, #45a049) !important;
+            color: white !important;
+            padding: 15px 30px !important;
+            text-align: center !important;
+            border-radius: 25px !important;
+            margin: 10px auto !important;
+            font-size: 18px !important;
+            font-weight: bold !important;
+            display: inline-block !important;
+            width: auto !important;
+            box-sizing: border-box !important;
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3) !important;
+            border: none !important;
+            max-width: fit-content !important;
+            min-width: auto !important;
+        ">
             کل رقم / Grand Total: Rs. 0.00
         </div>
 
@@ -1027,6 +1062,33 @@
             `;
             document.body.appendChild(iosInstallButton);
         }
+        
+        // NUCLEAR CACHE BUSTER - Force Grand Total to correct size
+        window.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const grandTotal = document.getElementById('grandTotal');
+                if (grandTotal) {
+                    // Force override all styles
+                    grandTotal.style.cssText = `
+                        background: linear-gradient(135deg, #4CAF50, #45a049) !important;
+                        color: white !important;
+                        padding: 15px 30px !important;
+                        text-align: center !important;
+                        border-radius: 25px !important;
+                        margin: 10px auto !important;
+                        font-size: 18px !important;
+                        font-weight: bold !important;
+                        display: inline-block !important;
+                        width: auto !important;
+                        max-width: fit-content !important;
+                        min-width: auto !important;
+                        box-sizing: border-box !important;
+                        box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3) !important;
+                        border: none !important;
+                    `;
+                }
+            }, 100);
+        });
     </script>
 </body>
 </html>
